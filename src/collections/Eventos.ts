@@ -1,9 +1,10 @@
 import type { CollectionConfig } from 'payload'
 
-export const Media: CollectionConfig = {
-  slug: 'media',
+export const Eventos: CollectionConfig = {
+  slug: 'eventos',
   admin: {
-    // Oculta la colección Media del menú lateral si el usuario no es admin
+    useAsTitle: 'titulo',
+    // Oculta la colección Eventos del menú lateral si el usuario no es admin
     hidden: ({ user }) => user?.rol !== 'admin',
   },
   access: {
@@ -11,10 +12,9 @@ export const Media: CollectionConfig = {
   },
   fields: [
     {
-      name: 'alt',
+      name: 'titulo',
       type: 'text',
       required: true,
     },
   ],
-  upload: true,
 }

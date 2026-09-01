@@ -7,6 +7,11 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Ensayos } from './collections/Ensayos'
+import { Eventos } from './collections/Eventos'
+
+import { Autores } from './collections/Autores'
+import { Conversaciones } from './collections/Conversaciones'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -14,11 +19,24 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
+    meta: {
+      titleSuffix: '- Círculo de Estudios Luis María Grignion de Montfort',
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      actions: ['/components/AdminHeader/CustomHeader#CustomHeader'],
+      graphics: {
+        Logo: '/components/AdminHeaderTitle#AdminHeaderTitle',
+      },
+      // Lista única de componentes al final de la navegación lateral
+      afterNavLinks: [
+        '/components/AdminNav/CustomNav#CustomNav',
+      ],
+    },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, Ensayos, Eventos, Autores, Conversaciones,],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -69,6 +69,10 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    ensayos: Ensayo;
+    eventos: Evento;
+    autores: Autore;
+    conversaciones: Conversacione;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,6 +82,10 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    ensayos: EnsayosSelect<false> | EnsayosSelect<true>;
+    eventos: EventosSelect<false> | EventosSelect<true>;
+    autores: AutoresSelect<false> | AutoresSelect<true>;
+    conversaciones: ConversacionesSelect<false> | ConversacionesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -123,6 +131,8 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: string;
+  nombre: string;
+  rol: 'admin' | 'autor';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -163,6 +173,110 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ensayos".
+ */
+export interface Ensayo {
+  id: string;
+  titulo: string;
+  autorRef?: (string | null) | User;
+  /**
+   * Perfil del autor o coautores del escrito.
+   */
+  autor: (string | Autore)[];
+  categoria?: ('general' | 'anacleto-gonzalez-flores') | null;
+  subcategoria?:
+    ('la-cuestion-religiosa' | 'ensayos-y-discursos' | 'tu-seras-rey' | 'el-plebiscito-de-los-martires') | null;
+  /**
+   * Hilo conceptual o debate bajo el cual se enmarca este texto.
+   */
+  conversacion?: (string | null) | Conversacione;
+  /**
+   * Texto base del cual surge esta réplica, adenda o respuesta.
+   */
+  parentEssay?: (string | null) | Ensayo;
+  /**
+   * Textos con los que establece debate o referencia cruzada.
+   */
+  relatedEssays?: (string | Ensayo)[] | null;
+  resumen?: string | null;
+  contenido: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  pdfAdjunto?: (string | null) | Media;
+  fechaPublicacion?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "autores".
+ */
+export interface Autore {
+  id: string;
+  nombre: string;
+  foto?: (string | null) | Media;
+  /**
+   * Semblanza del autor, contexto histórico o perfil académico.
+   */
+  biografia?: string | null;
+  /**
+   * Víncula este perfil con una cuenta de usuario si aplica.
+   */
+  usuarioAsociado?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conversaciones".
+ */
+export interface Conversacione {
+  id: string;
+  /**
+   * Nombre del hilo conceptual que agrupa los ensayos.
+   */
+  titulo: string;
+  /**
+   * Identificador para la URL (ej. debate-derecho-natural).
+   */
+  slug: string;
+  /**
+   * Introducción a las preguntas o planteamientos centrales de este hilo.
+   */
+  descripcion?: string | null;
+  estado?: ('abierta' | 'concluida' | 'archivada') | null;
+  /**
+   * Usuario encargado de coordinar la síntesis o flujo de la discusión.
+   */
+  moderador?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventos".
+ */
+export interface Evento {
+  id: string;
+  titulo: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -192,6 +306,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'ensayos';
+        value: string | Ensayo;
+      } | null)
+    | ({
+        relationTo: 'eventos';
+        value: string | Evento;
+      } | null)
+    | ({
+        relationTo: 'autores';
+        value: string | Autore;
+      } | null)
+    | ({
+        relationTo: 'conversaciones';
+        value: string | Conversacione;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -240,6 +370,8 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  nombre?: T;
+  rol?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -274,6 +406,61 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ensayos_select".
+ */
+export interface EnsayosSelect<T extends boolean = true> {
+  titulo?: T;
+  autorRef?: T;
+  autor?: T;
+  categoria?: T;
+  subcategoria?: T;
+  conversacion?: T;
+  parentEssay?: T;
+  relatedEssays?: T;
+  resumen?: T;
+  contenido?: T;
+  pdfAdjunto?: T;
+  fechaPublicacion?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "eventos_select".
+ */
+export interface EventosSelect<T extends boolean = true> {
+  titulo?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "autores_select".
+ */
+export interface AutoresSelect<T extends boolean = true> {
+  nombre?: T;
+  foto?: T;
+  biografia?: T;
+  usuarioAsociado?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conversaciones_select".
+ */
+export interface ConversacionesSelect<T extends boolean = true> {
+  titulo?: T;
+  slug?: T;
+  descripcion?: T;
+  estado?: T;
+  moderador?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
