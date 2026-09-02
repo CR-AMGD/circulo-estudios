@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { UserMenu } from './UserMenu'
 import { useState, useEffect } from 'react'
@@ -42,18 +43,31 @@ export function Navbar({ user }: NavbarProps) {
     <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Círculo de Estudios */}
-        <Link 
-          href="/" 
-          className="flex flex-col text-left group no-underline"
-        >
+      {/* Círculo de Estudios con Icono Más Grande */}
+      <Link 
+        href="/" 
+        className="flex items-center gap-3 group no-underline"
+      >
+        <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+          <Image
+            src="/logo.svg"
+            alt="Círculo de Estudios"
+            width={40}
+            height={40}
+            className="w-10 h-10 object-contain transition-transform duration-200 group-hover:scale-105"
+            priority
+          />
+        </div>
+
+        <div className="flex flex-col text-left">
           <span className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors leading-tight">
             Círculo de Estudios
           </span>
           <span className="text-[11px] font-medium text-[#38bdf8] tracking-wide leading-tight">
             Luis María Grignion de Montfort
           </span>
-        </Link>
+        </div>
+      </Link>
 
         {/* Enlaces de Navegación */}
         <nav className="flex items-center gap-4 text-sm font-medium">
