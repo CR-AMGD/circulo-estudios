@@ -6,6 +6,7 @@ import path from 'path'
 const normalizarNombreAutor = (slugAutor: string): string => {
   const mapaNombres: Record<string, string> = {
     'beato-anacleto-gonzalez-flores': 'Beato Anacleto González Flores',
+    'anacleto-gonzalez-flores': 'Beato Anacleto González Flores',
   }
 
   if (mapaNombres[slugAutor]) return mapaNombres[slugAutor]
@@ -31,8 +32,10 @@ const importEnsayos = async () => {
     }
     const adminUser = users.docs[0]
 
-    // 2. Leer JSON
-    const filePath = path.join(process.cwd(), 'data', 'ensayos.json')
+    // 2. Leer JSON (Permite pasar el nombre del archivo como parámetro)
+    const jsonFilename = process.argv[2] || 'cuestion_religiosa_jalisco.json'
+    const filePath = path.join(process.cwd(), 'data', jsonFilename)
+
     if (!fs.existsSync(filePath)) {
       throw new Error(`No se encontró el archivo JSON en: ${filePath}`)
     }
@@ -40,10 +43,16 @@ const importEnsayos = async () => {
     const rawData = fs.readFileSync(filePath, 'utf-8')
     const { ensayos, metadata } = JSON.parse(rawData)
 
-    console.log(`🚀 Iniciando ingesta de ${ensayos.length} ensayos...`)
+    console.log(`🚀 Iniciando ingesta de ${ensayos.length} ensayos desde "${jsonFilename}"...`)
+
+    // Mapa de nombres formateados para categorías
+    const mapaCategorias: Record<string, string> = {
+      'la-cuestion-religiosa-en-jalisco': 'La Cuestión Religiosa en Jalisco',
+      'ensayos-y-discursos': 'Ensayos y discursos',
+    }
 
     for (const ensayo of ensayos) {
-      // Validar duplicados por TÍTULO (ya que 'slug' no está definido en Ensayos.ts)
+      // Evitar duplicados por TÍTULO
       const existingEssay = await payload.find({
         collection: 'ensayos',
         where: { titulo: { equals: ensayo.titulo } },
@@ -66,16 +75,17 @@ const importEnsayos = async () => {
       if (categoriaQuery.docs.length > 0) {
         categoriaId = categoriaQuery.docs[0].id
       } else {
+        const nombreCategoria = mapaCategorias[categoriaSlug] || categoriaSlug.replace(/-/g, ' ').toUpperCase()
         const nuevaCategoria = await payload.create({
           collection: 'categorias',
           data: {
-            nombre: categoriaSlug.replace(/-/g, ' ').toUpperCase(),
+            nombre: nombreCategoria,
             slug: categoriaSlug,
-            colorAcento: 'sky',
+            colorAcento: 'amber',
           },
         })
         categoriaId = nuevaCategoria.id
-        console.log(`➕ Categoría creada: "${nuevaCategoria.nombre}"`)
+        console.log(`➕ Categoría creada: "${nuevaCategoria.nombre}" (Slug: ${nuevaCategoria.slug})`)
       }
 
       // --- RESOLVER O CREAR AUTORES ---
@@ -105,7 +115,9 @@ const importEnsayos = async () => {
         }
       }
 
-      // --- CREAR ENSAYO ---
+      // --- RESOLVER FECHA Y CREAR ENSAYO ---
+      const fechaEnsayo = ensayo.fechaPublicacion || (metadata.fecha_publicacion ? `${metadata.fecha_publicacion}T00:00:00.000Z` : new Date().toISOString())
+
       const ensayoCreado = await payload.create({
         collection: 'ensayos',
         data: {
@@ -113,9 +125,9 @@ const importEnsayos = async () => {
           autorRef: adminUser.id,
           autor: autoresIds,
           categoria: categoriaId,
-          resumen: ensayo.resumen,
+          resumen: ensayo.resumen || `Capítulo perteneciente a ${metadata.pdf_fuente || 'la obra'}.`,
           contenido: ensayo.contenido,
-          fechaPublicacion: ensayo.fechaPublicacion,
+          fechaPublicacion: fechaEnsayo,
           _status: 'published',
         },
       })
