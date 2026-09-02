@@ -6,6 +6,7 @@ import { RichText } from '@payloadcms/richtext-lexical/react'
 
 import { formatearFecha } from '@/utils/formatearFecha'
 import { EnsayoLayout } from '@/components/EnsayoLayout'
+import { SetNavbarActive } from '@/components/SetNavbarActive'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -141,6 +142,9 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
 
   return (
     <article className="min-h-screen bg-neutral-950 text-neutral-100 font-sans py-10 px-4 sm:px-6">
+      {/* Componente de cliente que avisa al Navbar si debe parpadear en ámbar */}
+      <SetNavbarActive active={esAnacleto} />
+
       <div className="max-w-6xl mx-auto">
         {/* Navegación Superior */}
         <div className="mb-8">
