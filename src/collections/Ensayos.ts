@@ -107,33 +107,20 @@ export const Ensayos: CollectionConfig = {
         description: 'Perfil del autor o coautores del escrito.',
       },
     },
+
+    // ==========================================
+    // SECCIÓN / CATEGORÍA DINÁMICA (RELACIÓN CRUD)
+    // ==========================================
     {
       name: 'categoria',
-      type: 'select',
+      type: 'relationship',
+      relationTo: 'categorias',
+      hasMany: false,
       label: 'Sección / Categoría',
-      defaultValue: 'general',
-      options: [
-        { label: 'General / Otros', value: 'general' },
-        { label: 'Anacleto González Flores', value: 'anacleto-gonzalez-flores' },
-      ],
       admin: {
         position: 'sidebar',
+        description: 'Categoría o subcategoría temática a la que pertenece el ensayo.',
       },
-    },
-    {
-      name: 'subcategoria',
-      type: 'select',
-      label: 'Obra / Libro',
-      admin: {
-        position: 'sidebar',
-        condition: (data) => data?.categoria === 'anacleto-gonzalez-flores',
-      },
-      options: [
-        { label: 'La cuestión religiosa en Jalisco', value: 'la-cuestion-religiosa' },
-        { label: 'Ensayos y discursos', value: 'ensayos-y-discursos' },
-        { label: 'Tú serás Rey', value: 'tu-seras-rey' },
-        { label: 'El plebiscito de los mártires', value: 'el-plebiscito-de-los-martires' },
-      ],
     },
 
     // ==========================================

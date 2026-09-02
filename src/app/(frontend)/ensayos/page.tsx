@@ -1,4 +1,3 @@
-// src/app/(frontend)/ensayos/page.tsx
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { ListaEnsayosAcordeon } from '@/components/ListaEnsayosAcordeon'
@@ -7,46 +6,64 @@ import Link from 'next/link'
 export default async function EnsayosPage() {
   const payload = await getPayload({ config })
 
-  // Trae solo los ensayos de colaboradores (excluye Epopeya Cristera / Anacleto)
-  const { docs: ensayos } = await payload.find({
+  // 1. Traemos los ensayos publicados con depth: 2 para que los autores vengan poblados
+  const { docs: ensayosRaw } = await payload.find({
     collection: 'ensayos',
+    depth: 2,
     where: {
-      and: [
-        { _status: { equals: 'published' } },
-        { categoria: { not_equals: 'anacleto-gonzalez-flores' } },
-      ],
+      _status: { equals: 'published' },
     },
     sort: '-fechaPublicacion',
     limit: 100,
   })
 
-  // Agrupar ensayos por autor extrayendo un string clave unificado
-  const ensayosPorAutor = ensayos.reduce((acc, ensayo) => {
-    let autorNombre = 'Anónimo'
-    const rawAutor = ensayo.autor as any
+  // 2. Filtramos el ensayo de Anacleto comprobando si alguno de sus autores en el arreglo es Anacleto
+  const ensayos = ensayosRaw.filter((ensayo: any) => {
+    const autores = ensayo.autor
+    if (!Array.isArray(autores)) return true
 
-    if (Array.isArray(rawAutor) && rawAutor.length > 0) {
-      const primerAutor = rawAutor[0]
-      if (typeof primerAutor === 'object' && primerAutor !== null) {
-        autorNombre = primerAutor.nombre || primerAutor.email || String(primerAutor.id)
-      } else if (typeof primerAutor === 'string') {
-        autorNombre = primerAutor
-      }
-    } else if (typeof rawAutor === 'object' && rawAutor !== null) {
-      autorNombre = rawAutor.nombre || rawAutor.email || String(rawAutor.id)
-    } else if (typeof rawAutor === 'string' && rawAutor) {
-      autorNombre = rawAutor
+    // Si alguno de los autores en la lista es Anacleto, lo excluimos del repositorio general
+    const esDeAnacleto = autores.some((a: any) => {
+      const nombre = typeof a === 'object' && a !== null ? (a.nombre || '') : String(a)
+      const slug = typeof a === 'object' && a !== null ? (a.slug || '') : ''
+      return (
+        nombre.toLowerCase().includes('anacleto gonzález flores') ||
+        slug === 'anacleto-gonzalez-flores'
+      )
+    })
+
+    return !esDeAnacleto
+  })
+
+  // 3. Agrupamos los ensayos restantes respetando la estructura hasMany: true de autores
+  const ensayosPorAutor = ensayos.reduce((acc, ensayo) => {
+    const rawAutores = ensayo.autor
+    let nombresAutores: string[] = []
+
+    if (Array.isArray(rawAutores)) {
+      nombresAutores = rawAutores.map((a: any) => {
+        if (typeof a === 'object' && a !== null) {
+          return a.nombre || a.email || String(a.id || 'Autor')
+        }
+        return String(a)
+      })
+    } else if (typeof rawAutores === 'object' && rawAutores !== null) {
+      nombresAutores = [(rawAutores as any).nombre || (rawAutores as any).email || 'Autor']
+    } else if (typeof rawAutores === 'string' && rawAutores) {
+      nombresAutores = [rawAutores]
     }
 
-    if (!acc[autorNombre]) acc[autorNombre] = []
+    // Si tiene múltiples autores, los unimos por comas para la clave del acordeón
+    const claveAutor = nombresAutores.length > 0 ? nombresAutores.join(', ') : 'Anónimo'
 
-    // Normalizar resumen de null a undefined para compatibilidad con la prop del componente
+    if (!acc[claveAutor]) acc[claveAutor] = []
+
     const ensayoNormalizado = {
       ...ensayo,
       resumen: ensayo.resumen ?? undefined,
     }
 
-    acc[autorNombre].push(ensayoNormalizado as any)
+    acc[claveAutor].push(ensayoNormalizado as any)
     return acc
   }, {} as Record<string, any[]>)
 

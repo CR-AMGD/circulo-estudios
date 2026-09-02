@@ -3,13 +3,20 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 
+interface CategoriaObj {
+  id: string
+  nombre?: string
+  slug?: string
+}
+
 interface Ensayo {
   id: string
   titulo: string
   autor?: string
   resumen?: string
   contenido?: any
-  subcategoria?: string
+  // Soportamos que categoría venga como string (ID), objeto poblado, o array
+  categoria?: string | CategoriaObj | (string | CategoriaObj)[]
   fechaPublicacion?: string
 }
 
@@ -19,7 +26,7 @@ interface AnacletoAccordionProps {
 
 const SECCIONES = [
   { key: 'ensayos-y-discursos', title: 'Ensayos y discursos' },
-  { key: 'la-cuestion-religiosa', title: 'La cuestión religiosa en Jalisco' },
+  { key: 'la-cuestion-religiosa-en-jalisco', title: 'La cuestión religiosa en Jalisco' },
   { key: 'el-plebiscito-de-los-martires', title: 'El plebiscito de los mártires' },
   { key: 'tu-seras-rey', title: 'Tú serás Rey' },
 ]
@@ -47,7 +54,24 @@ export const AnacletoAccordion: React.FC<AnacletoAccordionProps> = ({ ensayos })
 
   // Mapear y filtrar las secciones con sus respectivos escritos
   const seccionesProcesadas = SECCIONES.map((seccion) => {
-    const itemsSeccion = ensayos.filter((e) => e.subcategoria === seccion.key)
+    const itemsSeccion = ensayos.filter((e) => {
+      if (!e.categoria) return false
+
+      // Función interna para evaluar si una categoría coincide con la sección actual
+      const coincideSeccion = (cat: any) => {
+        if (!cat) return false
+        if (typeof cat === 'object') {
+          return cat.slug === seccion.key || cat.id === seccion.key || cat.nombre?.toLowerCase() === seccion.title.toLowerCase()
+        }
+        return String(cat) === seccion.key
+      }
+
+      if (Array.isArray(e.categoria)) {
+        return e.categoria.some(coincideSeccion)
+      }
+
+      return coincideSeccion(e.categoria)
+    })
 
     // Filtrar por término de búsqueda
     const itemsFiltrados = itemsSeccion.filter((item) => {

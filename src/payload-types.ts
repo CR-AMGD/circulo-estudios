@@ -73,6 +73,7 @@ export interface Config {
     eventos: Evento;
     autores: Autore;
     conversaciones: Conversacione;
+    categorias: Categoria;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     eventos: EventosSelect<false> | EventosSelect<true>;
     autores: AutoresSelect<false> | AutoresSelect<true>;
     conversaciones: ConversacionesSelect<false> | ConversacionesSelect<true>;
+    categorias: CategoriasSelect<false> | CategoriasSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -183,9 +185,10 @@ export interface Ensayo {
    * Perfil del autor o coautores del escrito.
    */
   autor: (string | Autore)[];
-  categoria?: ('general' | 'anacleto-gonzalez-flores') | null;
-  subcategoria?:
-    ('la-cuestion-religiosa' | 'ensayos-y-discursos' | 'tu-seras-rey' | 'el-plebiscito-de-los-martires') | null;
+  /**
+   * Categoría o subcategoría temática a la que pertenece el ensayo.
+   */
+  categoria?: (string | null) | Categoria;
   /**
    * Hilo conceptual o debate bajo el cual se enmarca este texto.
    */
@@ -236,6 +239,28 @@ export interface Autore {
    * Víncula este perfil con una cuenta de usuario si aplica.
    */
   usuarioAsociado?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias".
+ */
+export interface Categoria {
+  id: string;
+  nombre: string;
+  /**
+   * Se genera automáticamente a partir del nombre si se deja en blanco.
+   */
+  slug: string;
+  /**
+   * Si se deja vacío, actúa como Categoría Principal. Si se selecciona una, será una Subcategoría.
+   */
+  categoriaPadre?: (string | null) | Categoria;
+  /**
+   * Color temático con el que se renderizará el frontend.
+   */
+  colorAcento: 'sky' | 'amber' | 'emerald' | 'purple' | 'rose';
   updatedAt: string;
   createdAt: string;
 }
@@ -322,6 +347,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'conversaciones';
         value: string | Conversacione;
+      } | null)
+    | ({
+        relationTo: 'categorias';
+        value: string | Categoria;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -416,7 +445,6 @@ export interface EnsayosSelect<T extends boolean = true> {
   autorRef?: T;
   autor?: T;
   categoria?: T;
-  subcategoria?: T;
   conversacion?: T;
   parentEssay?: T;
   relatedEssays?: T;
@@ -459,6 +487,18 @@ export interface ConversacionesSelect<T extends boolean = true> {
   descripcion?: T;
   estado?: T;
   moderador?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categorias_select".
+ */
+export interface CategoriasSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  categoriaPadre?: T;
+  colorAcento?: T;
   updatedAt?: T;
   createdAt?: T;
 }

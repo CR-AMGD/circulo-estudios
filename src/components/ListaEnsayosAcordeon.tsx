@@ -4,6 +4,12 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
+interface CategoriaObj {
+  id: string
+  nombre?: string
+  slug?: string
+}
+
 interface Ensayo {
   id: string
   titulo: string
@@ -11,6 +17,7 @@ interface Ensayo {
   contenido?: any
   fechaPublicacion?: string
   autor?: any
+  categoria?: string | CategoriaObj | (string | CategoriaObj)[]
 }
 
 interface Props {
@@ -56,18 +63,13 @@ export function ListaEnsayosAcordeon({ ensayosPorAutor }: Props) {
 
   const query = busqueda.trim().toLowerCase()
 
-  // Normalizar y agrupar ensayos por nombre de autor formateado
+ // Usamos directamente las llaves enviadas por el servidor ya filtradas
   const agrupadoNormalizado: Record<string, Ensayo[]> = {}
 
   Object.entries(ensayosPorAutor || {}).forEach(([key, items]) => {
-    items.forEach((item) => {
-      // Extraemos el nombre legible del autor desde el ítem o la clave
-      const nombreNombre = parseNombreAutor(item.autor || key)
-      if (!agrupadoNormalizado[nombreNombre]) {
-        agrupadoNormalizado[nombreNombre] = []
-      }
-      agrupadoNormalizado[nombreNombre].push(item)
-    })
+    if (items && items.length > 0) {
+      agrupadoNormalizado[key] = items
+    }
   })
 
   // Filtrar y ordenar los ensayos por autor

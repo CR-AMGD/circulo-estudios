@@ -7,13 +7,30 @@ import { AnacletoAccordion } from '@/components/AnacletoAccordion'
 export default async function AnacletoPage() {
   const payload = await getPayload({ config })
 
-  const { docs: ensayos } = await payload.find({
-    collection: 'ensayos',
+  // 1. Buscamos la categoría correspondiente al slug general de esta sección
+  const categoriasMatch = await payload.find({
+    collection: 'categorias',
     where: {
-      categoria: {
-        equals: 'anacleto-gonzalez-flores',
+      slug: {
+        equals: 'anacleto-gonzalez-flores', // O el slug raíz que agrupe al autor/sección
       },
     },
+    limit: 1,
+  })
+
+  const categoriaId = categoriasMatch.docs[0]?.id
+
+  // 2. Buscamos los ensayos asociados a ese ID (o traemos todos si prefieres filtrarlos en el componente por subcategorías/slugs hijos)
+  const { docs: ensayos } = await payload.find({
+    collection: 'ensayos',
+    depth: 1, // Vital para que traiga los datos de la categoría y subcategorías poblados
+    where: categoriaId
+      ? {
+          categoria: {
+            equals: categoriaId,
+          },
+        }
+      : {}, // Si por algo no encuentra la categoría, trae un respaldo o vacío
     limit: 100,
   })
 
