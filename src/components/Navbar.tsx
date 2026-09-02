@@ -10,15 +10,20 @@ interface NavbarProps {
     nombre?: string
     rol?: string
   } | null
+  forceActiveSection?: 'epopeya-cristera' | 'ensayos' | null
 }
 
-export function Navbar({ user }: NavbarProps) {
+export function Navbar({ user, forceActiveSection }: NavbarProps) {
   const rawPathname = usePathname()
   const pathname = (rawPathname || '').toLowerCase()
 
-  // Evaluación de rutas activas
-  const isEpopeyaActive = pathname.includes('epopeya-cristera')
-  const isEnsayosActive = pathname.includes('ensayo')
+  // Evaluación de rutas activas (permite forzar desde una página hija si es necesario)
+  const isEpopeyaActive = forceActiveSection === 'epopeya-cristera' || pathname.includes('epopeya-cristera')
+  
+  // Si está forzado a epopeya, evitamos que Ensayos se prenda de forma indebida
+  const isEnsayosActive = forceActiveSection 
+    ? forceActiveSection === 'ensayos' 
+    : pathname.includes('ensayo') && !isEpopeyaActive
 
   return (
     <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur sticky top-0 z-50">

@@ -30,10 +30,28 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  // Redirección dinámica según categoría
-  const esAnacleto = ensayo.categoria === 'anacleto-gonzalez-flores'
+  // Detección de categoría para enrutar a Epopeya Cristera
+  const cat = ensayo.categoria
+  const slugCategoria = typeof cat === 'object' && cat !== null ? (cat.slug || '') : String(cat || '')
+  const nombreCategoria = typeof cat === 'object' && cat !== null ? (cat.nombre || '') : ''
+
+  const esAnacleto = 
+    slugCategoria === 'anacleto-gonzalez-flores' || 
+    slugCategoria === 'la-cuestion-religiosa-en-jalisco' || 
+    slugCategoria.includes('anacleto') || 
+    nombreCategoria.toLowerCase().includes('anacleto') ||
+    nombreCategoria.toLowerCase().includes('cuestión religiosa')
+
+  // Enlaces y textos dinámicos según la sección
   const backHref = esAnacleto ? '/epopeya-cristera/anacleto-gonzalez-flores' : '/ensayos'
   const backText = esAnacleto ? '← Volver a Beato Anacleto' : '← Volver a Ensayos'
+
+  // Definición de colores según sección (Ámbar para Epopeya Cristera, Azul para Ensayos generales)
+  const accentColorClass = esAnacleto ? 'text-amber-500' : 'text-[#38bdf8]'
+  const accentBorderClass = esAnacleto ? 'border-amber-500/40' : 'border-[#38bdf8]/40'
+  const accentBgBadgeClass = esAnacleto ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-[#38bdf8]/10 text-[#38bdf8] border-[#38bdf8]/20'
+  const accentButtonClass = esAnacleto ? 'bg-amber-500 hover:bg-amber-400 text-neutral-950' : 'bg-[#38bdf8] hover:bg-[#7dd3fc] text-neutral-950'
+  const hoverGroupColor = esAnacleto ? 'group-hover:text-amber-500 hover:border-amber-500/50' : 'group-hover:text-[#38bdf8] hover:border-[#38bdf8]/50'
 
   // Normalización de relaciones
   const autores = Array.isArray(ensayo.autor) ? ensayo.autor : [ensayo.autor].filter(Boolean)
@@ -60,7 +78,7 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
       {conversacion && conversacion.titulo && (
         <div className="space-y-1.5">
           <span className="text-[11px] font-mono text-neutral-500 block">Hilo conceptual:</span>
-          <div className="inline-block px-3 py-1.5 rounded-md bg-[#38bdf8]/10 text-[#38bdf8] border border-[#38bdf8]/20 text-xs font-medium">
+          <div className={`inline-block px-3 py-1.5 rounded-md border text-xs font-medium ${accentBgBadgeClass}`}>
             {conversacion.titulo}
           </div>
         </div>
@@ -72,9 +90,9 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
           <span className="text-[11px] font-mono text-neutral-500 block">↳ Responde / Deriva de:</span>
           <Link
             href={`/ensayos/${parentEssay.id}`}
-            className="block p-3 rounded-lg bg-neutral-950 hover:bg-neutral-850 border border-neutral-800 hover:border-[#38bdf8]/50 transition-all group"
+            className={`block p-3 rounded-lg bg-neutral-950 hover:bg-neutral-850 border border-neutral-800 transition-all group ${hoverGroupColor}`}
           >
-            <p className="text-xs font-semibold text-neutral-200 group-hover:text-[#38bdf8] transition-colors line-clamp-2">
+            <p className={`text-xs font-semibold text-neutral-200 transition-colors line-clamp-2 ${hoverGroupColor}`}>
               {parentEssay.titulo}
             </p>
           </Link>
@@ -89,7 +107,7 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
             href={ensayo.pdfAdjunto.url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-neutral-950 bg-[#38bdf8] hover:bg-[#7dd3fc] rounded-lg transition-colors"
+            className={`w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold rounded-lg transition-colors ${accentButtonClass}`}
           >
             📄 Descargar PDF
           </a>
@@ -107,9 +125,9 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
                 <Link
                   key={rel.id}
                   href={`/ensayos/${rel.id}`}
-                  className="block p-3 rounded-lg bg-neutral-950 hover:bg-neutral-850 border border-neutral-800 hover:border-[#38bdf8]/50 transition-all group"
+                  className={`block p-3 rounded-lg bg-neutral-950 hover:bg-neutral-850 border border-neutral-800 transition-all group ${hoverGroupColor}`}
                 >
-                  <p className="text-xs font-medium text-neutral-200 group-hover:text-[#38bdf8] transition-colors line-clamp-2">
+                  <p className={`text-xs font-medium text-neutral-200 transition-colors line-clamp-2 ${hoverGroupColor}`}>
                     {rel.titulo}
                   </p>
                 </Link>
@@ -128,7 +146,7 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
         <div className="mb-8">
           <Link 
             href={backHref} 
-            className="inline-flex items-center text-xs font-semibold uppercase tracking-wider text-[#38bdf8] hover:underline transition-colors"
+            className={`inline-flex items-center text-xs font-semibold uppercase tracking-wider hover:underline transition-colors ${accentColorClass}`}
           >
             {backText}
           </Link>
@@ -147,7 +165,7 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
             </h1>
 
             {/* Firma de Autor */}
-            <div className="text-base text-[#38bdf8] font-medium flex flex-wrap items-center gap-1">
+            <div className={`text-base font-medium flex flex-wrap items-center gap-1 ${accentColorClass}`}>
               <span>Por</span>
               {autores.length > 0 ? (
                 autores.map((aut: any, idx: number) => {
@@ -170,7 +188,7 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
 
           {/* Resumen / Epígrafe */}
           {ensayo.resumen && (
-            <div className="p-4 bg-neutral-900/50 border-l-2 border-[#38bdf8] text-neutral-300 italic text-sm leading-relaxed rounded-r-lg">
+            <div className={`p-4 bg-neutral-900/50 border-l-2 text-neutral-300 italic text-sm leading-relaxed rounded-r-lg ${accentBorderClass}`}>
               {ensayo.resumen}
             </div>
           )}
