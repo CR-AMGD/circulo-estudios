@@ -31,14 +31,24 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  // Detección de categoría para enrutar a Epopeya Cristera
+  // Normalización de relaciones
+  const autores = Array.isArray(ensayo.autor) ? ensayo.autor : [ensayo.autor].filter(Boolean)
   const cat = ensayo.categoria
   const slugCategoria = typeof cat === 'object' && cat !== null ? (cat.slug || '') : String(cat || '')
   const nombreCategoria = typeof cat === 'object' && cat !== null ? (cat.nombre || '') : ''
 
+  // Detección si el autor es Anacleto
+  const esAutorAnacleto = autores.some((aut: any) => {
+    const nombre = typeof aut === 'object' && aut !== null ? (aut.nombre || '') : String(aut)
+    return nombre.toLowerCase().includes('anacleto')
+  })
+
+  // Evaluación global para enrutar a Epopeya Cristera / Anacleto
   const esAnacleto = 
+    esAutorAnacleto ||
     slugCategoria === 'anacleto-gonzalez-flores' || 
     slugCategoria === 'la-cuestion-religiosa-en-jalisco' || 
+    slugCategoria === 'ensayos-y-discursos' ||
     slugCategoria.includes('anacleto') || 
     nombreCategoria.toLowerCase().includes('anacleto') ||
     nombreCategoria.toLowerCase().includes('cuestión religiosa')
@@ -54,8 +64,6 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
   const accentButtonClass = esAnacleto ? 'bg-amber-500 hover:bg-amber-400 text-neutral-950' : 'bg-[#38bdf8] hover:bg-[#7dd3fc] text-neutral-950'
   const hoverGroupColor = esAnacleto ? 'group-hover:text-amber-500 hover:border-amber-500/50' : 'group-hover:text-[#38bdf8] hover:border-[#38bdf8]/50'
 
-  // Normalización de relaciones
-  const autores = Array.isArray(ensayo.autor) ? ensayo.autor : [ensayo.autor].filter(Boolean)
   const conversacion = typeof ensayo.conversacion === 'object' && ensayo.conversacion !== null ? ensayo.conversacion : null
   const parentEssay = typeof ensayo.parentEssay === 'object' && ensayo.parentEssay !== null ? ensayo.parentEssay : null
   const relatedEssays = Array.isArray(ensayo.relatedEssays) ? ensayo.relatedEssays : []
