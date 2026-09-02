@@ -15,7 +15,6 @@ interface Ensayo {
   autor?: string
   resumen?: string
   contenido?: any
-  // Soportamos que categoría venga como string (ID), objeto poblado, o array
   categoria?: string | CategoriaObj | (string | CategoriaObj)[]
   fechaPublicacion?: string
 }
@@ -31,7 +30,6 @@ const SECCIONES = [
   { key: 'tu-seras-rey', title: 'Tú serás Rey' },
 ]
 
-// Función auxiliar para extraer texto del contenido en búsquedas profundas
 function extraerTextoDeContenido(contenido: any): string {
   if (!contenido) return ''
   if (typeof contenido === 'string') return contenido
@@ -43,7 +41,8 @@ function extraerTextoDeContenido(contenido: any): string {
 }
 
 export const AnacletoAccordion: React.FC<AnacletoAccordionProps> = ({ ensayos }) => {
-  const [orden, setOrden] = useState<'desc' | 'asc'>('desc')
+  // Cambiado de 'desc' a 'asc' para que empiece por defecto en "Más antiguos"
+  const [orden, setOrden] = useState<'desc' | 'asc'>('asc')
   const [busqueda, setBusqueda] = useState('')
 
   const toggleOrden = () => {
@@ -52,12 +51,10 @@ export const AnacletoAccordion: React.FC<AnacletoAccordionProps> = ({ ensayos })
 
   const query = busqueda.trim().toLowerCase()
 
-  // Mapear y filtrar las secciones con sus respectivos escritos
   const seccionesProcesadas = SECCIONES.map((seccion) => {
     const itemsSeccion = ensayos.filter((e) => {
       if (!e.categoria) return false
 
-      // Función interna para evaluar si una categoría coincide con la sección actual
       const coincideSeccion = (cat: any) => {
         if (!cat) return false
         if (typeof cat === 'object') {
@@ -73,7 +70,6 @@ export const AnacletoAccordion: React.FC<AnacletoAccordionProps> = ({ ensayos })
       return coincideSeccion(e.categoria)
     })
 
-    // Filtrar por término de búsqueda
     const itemsFiltrados = itemsSeccion.filter((item) => {
       if (!query) return true
 
@@ -85,7 +81,6 @@ export const AnacletoAccordion: React.FC<AnacletoAccordionProps> = ({ ensayos })
       return tituloMatch || resumenMatch || contenidoMatch
     })
 
-    // Ordenar cronológicamente
     const itemsOrdenados = [...itemsFiltrados].sort((a, b) => {
       const dateA = new Date(a.fechaPublicacion || 0).getTime()
       const dateB = new Date(b.fechaPublicacion || 0).getTime()
@@ -99,14 +94,13 @@ export const AnacletoAccordion: React.FC<AnacletoAccordionProps> = ({ ensayos })
     }
   })
 
-  // Verificar si hay al menos un ensayo visible entre todas las secciones durante una búsqueda
   const hayResultados = seccionesProcesadas.some((sec) => sec.items.length > 0)
 
   return (
     <div className="space-y-6">
-      {/* Barra de Controles: Búsqueda (Izquierda) y Ordenamiento (Derecha) */}
+      {/* Barra de Controles */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {/* Campo de Búsqueda a la izquierda */}
+        {/* Campo de Búsqueda */}
         <div className="relative flex-1 max-w-md">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-500">
             <svg
@@ -140,12 +134,12 @@ export const AnacletoAccordion: React.FC<AnacletoAccordionProps> = ({ ensayos })
           )}
         </div>
 
-        {/* Botón de Ordenamiento a la derecha */}
+        {/* Botón de Ordenamiento (Inicia en "Más antiguos ↑") */}
         <button
           onClick={toggleOrden}
           className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-mono text-neutral-300 hover:text-white transition-all duration-200 cursor-pointer whitespace-nowrap self-end sm:self-auto"
         >
-          <span>Ordenar: {orden === 'desc' ? 'Más recientes' : 'Más antiguos'}</span>
+          <span>Ordenar: {orden === 'asc' ? 'Más antiguos' : 'Más recientes'}</span>
           <svg
             width="14"
             height="14"
