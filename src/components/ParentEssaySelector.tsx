@@ -8,22 +8,58 @@ interface Ensayo {
   titulo: string
 }
 
+interface Autor {
+  id: string
+  nombre: string
+}
+
 const modalID = 'parent-essay-search-modal'
 
 export default function ParentEssaySelector({ path, label, field }: { path: string; label: string; field?: { admin?: { description?: string } } }) {
   const { value, setValue } = useField<string>({ path })
   const { toggleModal } = useModal()
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedAuthorId, setSelectedAuthorId] = useState('')
+  const [authors, setAuthors] = useState<Autor[]>([])
   const [ensayos, setEnsayos] = useState<Ensayo[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedTitle, setSelectedTitle] = useState<string>('')
+  const [isModalOpenState, setIsModalOpenState] = useState(false)
 
+  const handleOpenModal = () => {
+    setIsModalOpenState(true)
+    toggleModal(modalID)
+    // Cargar autores al abrir el modal
+    fetch('/api/autores?limit=100')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.docs) {
+          setAuthors(data.docs)
+        }
+      })
+      .catch((err) => console.error('Error cargando autores:', err))
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpenState(false)
+    toggleModal(modalID)
+  }
+
+  // Búsqueda robusta con el operador 'contains' de Payload
   useEffect(() => {
     const fetchEnsayos = async () => {
       setLoading(true)
       try {
-        const query = searchQuery ? `&where[titulo][like]=${encodeURIComponent(searchQuery)}` : ''
-        const res = await fetch(`/api/ensayos?limit=10${query}`)
+        let url = `/api/ensayos?limit=10`
+        
+        if (searchQuery.trim()) {
+          url += `&where[titulo][contains]=${encodeURIComponent(searchQuery.trim())}`
+        }
+        if (selectedAuthorId) {
+          url += `&where[autor][equals]=${encodeURIComponent(selectedAuthorId)}`
+        }
+
+        const res = await fetch(url)
         const data = await res.json()
         if (data && data.docs) {
           setEnsayos(data.docs)
@@ -35,9 +71,15 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
       }
     }
 
-    fetchEnsayos()
-  }, [searchQuery])
+    if (isModalOpenState) {
+      const delayDebounce = setTimeout(() => {
+        fetchEnsayos()
+      }, 300) // Pequeño debounce para optimizar las peticiones mientras escribes
+      return () => clearTimeout(delayDebounce)
+    }
+  }, [searchQuery, selectedAuthorId, isModalOpenState])
 
+  // Obtener el título del ensayo seleccionado previamente
   useEffect(() => {
     if (value) {
       fetch(`/api/ensayos/${value}`)
@@ -75,10 +117,9 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
           {selectedTitle ? selectedTitle : 'Seleccionar valor...'}
         </div>
 
-        {/* Botón con diseño estilizado y moderno */}
         <button
           type="button"
-          onClick={() => toggleModal(modalID)}
+          onClick={handleOpenModal}
           style={{
             background: 'var(--theme-elevation-100)',
             color: 'var(--theme-elevation-800)',
@@ -129,14 +170,13 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
         )}
       </div>
 
-      {/* Mensaje de ayuda / descripción inferior idéntico al estilo de Payload */}
       {field?.admin?.description && (
         <div style={{ fontSize: '12px', color: 'var(--theme-elevation-500)', marginTop: '0.4rem', lineHeight: '1.4' }}>
           {field.admin.description}
         </div>
       )}
 
-      {/* Modal Nativo de Búsqueda */}
+      {/* Modal Nativo de Búsqueda Inteligente */}
       <Modal slug={modalID} style={{ maxWidth: '600px', width: '100%', margin: 'auto' }}>
         <div style={{
           background: 'var(--theme-elevation-0)',
@@ -145,17 +185,45 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
           boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
           border: '1px solid var(--theme-elevation-150)'
         }}>
-          <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: 600 }}>Seleccionar Ensayo Padre</h3>
+          <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', fontWeight: 600 }}>Búsqueda Inteligente de Ensayo Padre</h3>
+          
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '4px', color: 'var(--theme-elevation-600)' }}>
+              Filtrar por Autor (Opcional):
+            </label>
+            <select
+              value={selectedAuthorId}
+              onChange={(e) => setSelectedAuthorId(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 10px',
+                border: '1px solid var(--theme-elevation-200)',
+                borderRadius: '6px',
+                background: 'var(--theme-elevation-50)',
+                color: 'var(--theme-text)',
+                fontSize: '13px',
+                outline: 'none'
+              }}
+            >
+              <option value="">-- Todos los autores (Sin filtro) --</option>
+              {authors.map((autor) => (
+                <option key={autor.id} value={autor.id}>
+                  {autor.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <input
             type="text"
-            placeholder="Buscar por título..."
+            placeholder="Escribe para buscar por título..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             autoFocus
             style={{
               width: '100%',
               padding: '10px 14px',
-              margin: '12px 0',
+              margin: '8px 0 12px 0',
               border: '1px solid var(--theme-elevation-200)',
               borderRadius: '6px',
               background: 'var(--theme-elevation-50)',
@@ -165,7 +233,7 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
             }}
           />
           
-          <div style={{ minHeight: '200px', maxHeight: '320px', overflowY: 'auto', border: '1px solid var(--theme-elevation-150)', borderRadius: '6px', padding: '6px' }}>
+          <div style={{ minHeight: '180px', maxHeight: '280px', overflowY: 'auto', border: '1px solid var(--theme-elevation-150)', borderRadius: '6px', padding: '6px' }}>
             {loading ? (
               <p style={{ textAlign: 'center', color: 'var(--theme-elevation-500)', padding: '20px', fontSize: '13px' }}>Buscando...</p>
             ) : ensayos.length > 0 ? (
@@ -174,7 +242,7 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
                   key={ensayo.id}
                   onClick={() => {
                     setValue(ensayo.id)
-                    toggleModal(modalID)
+                    handleCloseModal()
                   }}
                   style={{
                     padding: '10px 12px',
@@ -190,14 +258,14 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
                 </div>
               ))
             ) : (
-              <p style={{ textAlign: 'center', color: 'var(--theme-elevation-500)', padding: '20px', fontSize: '13px' }}>No se encontraron ensayos.</p>
+              <p style={{ textAlign: 'center', color: 'var(--theme-elevation-500)', padding: '20px', fontSize: '13px' }}>No se encontraron ensayos con los filtros seleccionados.</p>
             )}
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
             <button
               type="button"
-              onClick={() => toggleModal(modalID)}
+              onClick={handleCloseModal}
               style={{
                 padding: '8px 16px',
                 background: 'var(--theme-elevation-150)',
