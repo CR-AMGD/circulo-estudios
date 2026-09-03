@@ -37,7 +37,7 @@ export default buildConfig({
       ],
     },
   },
-  collections: [Users, Media, Ensayos, Eventos, Autores, Conversaciones, Categorias,],
+  collections: [Users, Media, Ensayos, Eventos, Autores, Conversaciones, Categorias],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

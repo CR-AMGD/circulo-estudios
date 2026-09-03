@@ -135,6 +135,10 @@ export interface User {
   id: string;
   nombre: string;
   rol: 'admin' | 'autor';
+  /**
+   * Selecciona qué colecciones adicionales puede visualizar este usuario además de Ensayos y Autores.
+   */
+  coleccionesPermitidas?: ('categorias' | 'conversaciones' | 'media' | 'eventos')[] | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -401,6 +405,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   nombre?: T;
   rol?: T;
+  coleccionesPermitidas?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

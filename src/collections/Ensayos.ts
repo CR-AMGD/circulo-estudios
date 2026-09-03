@@ -1,4 +1,5 @@
 import type { Access, CollectionConfig, Where } from 'payload'
+import { isAdmin, isAuthenticated, canUpdateOrDeleteEnsayo } from '../access/roles'
 
 import {
   lexicalEditor,
@@ -7,18 +8,6 @@ import {
   HeadingFeature,
   BlockquoteFeature,
 } from '@payloadcms/richtext-lexical'
-
-const esOwnerOAdmin: Access = ({ req: { user } }) => {
-  if (!user) return false
-  if (user.rol === 'admin') return true
-
-  const query: Where = {
-    autorRef: {
-      equals: user.id,
-    },
-  }
-  return query
-}
 
 export const Ensayos: CollectionConfig = {
   slug: 'ensayos',
@@ -42,14 +31,17 @@ export const Ensayos: CollectionConfig = {
       return null
     },
 
+    // Si es colaborador, filtramos la lista en el panel para que vea los suyos o los de Anacleto
     baseListFilter: ({ req }) => {
       if (req?.user?.rol === 'admin') return null
       if (!req?.user) return null
 
+      // Opcional: si quieres que el colaborador vea sus ensayos propios O los de Anacleto en la lista
       return {
-        autorRef: {
-          equals: req.user.id,
-        },
+        or: [
+          { autorRef: { equals: req.user.id } },
+          { 'autor.nombre': { equals: 'Beato Anacleto González Flores' } },
+        ],
       }
     },
   },
@@ -63,6 +55,7 @@ export const Ensayos: CollectionConfig = {
           or: [
             { _status: { equals: 'published' } },
             { autorRef: { equals: user.id } },
+            { 'autor.nombre': { equals: 'Beato Anacleto González Flores' } },
           ],
         }
         return query
@@ -73,9 +66,9 @@ export const Ensayos: CollectionConfig = {
       }
       return queryPublic
     },
-    create: ({ req: { user } }) => Boolean(user),
-    update: esOwnerOAdmin,
-    delete: esOwnerOAdmin,
+    create: isAuthenticated,
+    update: canUpdateOrDeleteEnsayo, // <--- Regla centralizada para Anacleto
+    delete: isAdmin,
   },
 
   fields: [

@@ -215,4 +215,4 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
       </div>
     </article>
   )
-}
+} 

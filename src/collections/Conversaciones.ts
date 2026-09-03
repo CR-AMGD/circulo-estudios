@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { isAdmin, canSeeCollection } from '../access/roles'
 
 export const Conversaciones: CollectionConfig = {
   slug: 'conversaciones',
@@ -9,9 +10,19 @@ export const Conversaciones: CollectionConfig = {
   admin: {
     useAsTitle: 'titulo',
     defaultColumns: ['titulo', 'estado', 'createdAt'],
+    // Se oculta del menú si el usuario no es admin y tampoco tiene el permiso dinámico asignado
+    hidden: ({ user }) => {
+      if (user?.rol === 'admin') return false
+      const permitidas = (user as any)?.coleccionesPermitidas || []
+      return !permitidas.includes('conversaciones')
+    },
   },
   access: {
-    read: () => true, // Acceso público para visualizar los hilos de discusión
+    // Lectura dinámica condicionada a si el admin le dio acceso o si es admin
+    read: canSeeCollection('conversaciones'),
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {

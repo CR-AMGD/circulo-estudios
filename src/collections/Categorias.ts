@@ -1,5 +1,5 @@
-// src/collections/Categorias.ts
 import type { CollectionConfig, FieldHook } from 'payload'
+import { isAdmin, canSeeCollection } from '../access/roles'
 
 // Función auxiliar para formatear slugs de forma limpia
 const formatSlug = (val: string): string =>
@@ -30,10 +30,18 @@ export const Categorias: CollectionConfig = {
   admin: {
     useAsTitle: 'nombre',
     defaultColumns: ['nombre', 'slug', 'categoriaPadre', 'colorAcento'],
+    hidden: ({ user }) => {
+      if (user?.rol === 'admin') return false
+      const permitidas = (user as any)?.coleccionesPermitidas || []
+      return !permitidas.includes('categorias')
+    },
   },
 
   access: {
-    read: () => true,
+    read: canSeeCollection('categorias'),
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
 
   fields: [

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { isAuthenticated, isAdmin } from '../access/roles'
 
 export const Autores: CollectionConfig = {
   slug: 'autores',
@@ -10,7 +11,10 @@ export const Autores: CollectionConfig = {
     useAsTitle: 'nombre',
   },
   access: {
-    read: () => true, // Todos pueden ver los perfiles de autores
+    read: isAuthenticated,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {
