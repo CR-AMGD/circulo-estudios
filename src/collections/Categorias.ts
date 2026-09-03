@@ -30,15 +30,16 @@ export const Categorias: CollectionConfig = {
   admin: {
     useAsTitle: 'nombre',
     defaultColumns: ['nombre', 'slug', 'categoriaPadre', 'colorAcento'],
-    hidden: ({ user }) => {
-      if (user?.rol === 'admin') return false
+hidden: ({ user }) => {
+      if ((user as any)?.rol === 'admin') return false
       const permitidas = (user as any)?.coleccionesPermitidas || []
       return !permitidas.includes('categorias')
     },
   },
 
   access: {
-    read: canSeeCollection('categorias'),
+    // Permitir lectura a cualquier usuario autenticado para que los desplegables de los ensayos funcionen
+    read: ({ req: { user } }) => Boolean(user),
     create: isAdmin,
     update: isAdmin,
     delete: isAdmin,

@@ -194,16 +194,10 @@ export interface Ensayo {
    */
   categoria?: (string | null) | Categoria;
   /**
-   * Hilo conceptual o debate bajo el cual se enmarca este texto.
-   */
-  conversacion?: (string | null) | Conversacione;
-  /**
    * Texto base del cual surge esta réplica, adenda o respuesta.
    */
   parentEssay?: (string | null) | Ensayo;
-  /**
-   * Textos con los que establece debate o referencia cruzada.
-   */
+  conversacion?: (string | null) | Conversacione;
   relatedEssays?: (string | Ensayo)[] | null;
   resumen?: string | null;
   contenido: {
@@ -450,8 +444,8 @@ export interface EnsayosSelect<T extends boolean = true> {
   autorRef?: T;
   autor?: T;
   categoria?: T;
-  conversacion?: T;
   parentEssay?: T;
+  conversacion?: T;
   relatedEssays?: T;
   resumen?: T;
   contenido?: T;

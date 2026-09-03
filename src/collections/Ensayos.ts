@@ -36,7 +36,6 @@ export const Ensayos: CollectionConfig = {
       if (req?.user?.rol === 'admin') return null
       if (!req?.user) return null
 
-      // Opcional: si quieres que el colaborador vea sus ensayos propios O los de Anacleto en la lista
       return {
         or: [
           { autorRef: { equals: req.user.id } },
@@ -67,7 +66,7 @@ export const Ensayos: CollectionConfig = {
       return queryPublic
     },
     create: isAuthenticated,
-    update: canUpdateOrDeleteEnsayo, // <--- Regla centralizada para Anacleto
+    update: canUpdateOrDeleteEnsayo,
     delete: isAdmin,
   },
 
@@ -102,7 +101,7 @@ export const Ensayos: CollectionConfig = {
     },
 
     // ==========================================
-    // SECCIÓN / CATEGORÍA DINÁMICA (RELACIÓN CRUD)
+    // ORDEN DE RELACIONES Y ESTRUCTURA (ADMIN)
     // ==========================================
     {
       name: 'categoria',
@@ -113,21 +112,6 @@ export const Ensayos: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Categoría o subcategoría temática a la que pertenece el ensayo.',
-      },
-    },
-
-    // ==========================================
-    // RELACIONES FILOSÓFICAS / ESTRUCTURA DE DEBATE
-    // ==========================================
-    {
-      name: 'conversacion',
-      type: 'relationship',
-      relationTo: 'conversaciones',
-      hasMany: false,
-      label: 'Pertenece a Conversación / Hilo',
-      admin: {
-        position: 'sidebar',
-        description: 'Hilo conceptual o debate bajo el cual se enmarca este texto.',
       },
     },
     {
@@ -142,6 +126,21 @@ export const Ensayos: CollectionConfig = {
       },
     },
     {
+      name: 'conversacion',
+      type: 'relationship',
+      relationTo: 'conversaciones',
+      hasMany: false,
+      label: 'Pertenece a Conversación / Hilo',
+      admin: {
+        position: 'sidebar',
+      },
+      access: {
+        read: ({ req: { user } }) => user?.rol === 'admin',
+        create: ({ req: { user } }) => user?.rol === 'admin',
+        update: ({ req: { user } }) => user?.rol === 'admin',
+      },
+    },
+    {
       name: 'relatedEssays',
       type: 'relationship',
       relationTo: 'ensayos',
@@ -149,7 +148,11 @@ export const Ensayos: CollectionConfig = {
       label: 'Dialoga con (Ensayos Relacionados)',
       admin: {
         position: 'sidebar',
-        description: 'Textos con los que establece debate o referencia cruzada.',
+      },
+      access: {
+        read: ({ req: { user } }) => user?.rol === 'admin',
+        create: ({ req: { user } }) => user?.rol === 'admin',
+        update: ({ req: { user } }) => user?.rol === 'admin',
       },
     },
 
