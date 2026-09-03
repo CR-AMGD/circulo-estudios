@@ -122,7 +122,11 @@ export const Ensayos: CollectionConfig = {
       label: 'Deriva de (Ensayo Padre)',
       admin: {
         position: 'sidebar',
-        description: 'Texto base del cual surge esta réplica, adenda o respuesta.',
+        description: 'Texto base al cual responde este ensayo.',
+        // Apunta directamente a la exportación por defecto de nuestro selector con lupa y modal
+        components: {
+          Field: '@/components/ParentEssaySelector',
+        },
       },
     },
     {
