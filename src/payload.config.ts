@@ -9,7 +9,6 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Ensayos } from './collections/Ensayos'
 import { Eventos } from './collections/Eventos'
-
 import { Autores } from './collections/Autores'
 import { Conversaciones } from './collections/Conversaciones'
 import { Categorias } from './collections/Categorias'
@@ -29,7 +28,9 @@ export default buildConfig({
     components: {
       actions: ['/components/AdminHeader/CustomHeader#CustomHeader'],
       graphics: {
-        Logo: '/components/AdminHeaderTitle#AdminHeaderTitle',
+        Logo: {
+          path: '/components/AdminHeaderTitle#AdminHeaderTitle',
+        },
       },
       // Lista única de componentes al final de la navegación lateral
       afterNavLinks: [

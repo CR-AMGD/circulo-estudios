@@ -2,22 +2,59 @@ import React from 'react'
 
 export const AdminHeaderTitle: React.FC = () => {
   return (
-    <div className="flex items-center gap-3">
-      {/* Icono a la izquierda */}
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+      width: '100%',
+      margin: '0 auto',
+      paddingBottom: '4px'
+    }}>
+      {/* Icono del corazón a 280px */}
       <img
-        src="/logo.svg"
+        src="/dieu_de_roi-removebg-preview.png"
         alt="Círculo de Estudios Logo"
-        className="w-8 h-8 object-contain shrink-0"
+        style={{
+          width: '280px',
+          height: '280px',
+          objectFit: 'contain',
+          marginBottom: '4px', // Reducido para acercar el texto de manera sutil
+          display: 'block',
+          marginLeft: 'auto',
+          marginRight: 'auto'
+        }}
       />
 
-      {/* Textos alineados a la izquierda */}
-      <div className="flex flex-col text-left justify-center">
-        <span className="text-sm font-bold text-white leading-tight">
+      {/* Textos institucionales organizados */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%'
+      }}>
+        <div style={{
+          fontSize: '17px',
+          fontWeight: '700',
+          color: '#ffffff',
+          lineHeight: '1.3',
+          letterSpacing: '0.5px'
+        }}>
           Círculo de Estudios
-        </span>
-        <span className="text-[11px] font-medium text-[#38bdf8] leading-tight mt-0.5">
+        </div>
+        <div style={{
+          fontSize: '11px',
+          fontWeight: '600',
+          color: '#38bdf8',
+          lineHeight: '1.3',
+          letterSpacing: '1px',
+          textTransform: 'uppercase',
+          marginTop: '2px'
+        }}>
           Luis María Grignion de Montfort
-        </span>
+        </div>
       </div>
     </div>
   )
