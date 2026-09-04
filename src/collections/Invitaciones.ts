@@ -10,6 +10,8 @@ export const Invitaciones: CollectionConfig = {
   admin: {
     useAsTitle: 'titulo',
     defaultColumns: ['titulo', 'activo', 'enlaceCompleto', 'updatedAt'],
+    // Oculta la colección del panel lateral y dashboard si el usuario no es admin
+    hidden: ({ user }) => user?.rol !== 'admin',
   },
   access: {
     read: () => true, 
