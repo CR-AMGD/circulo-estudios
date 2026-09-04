@@ -68,12 +68,12 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
-    media: Media;
-    ensayos: Ensayo;
-    eventos: Evento;
     autores: Autore;
-    conversaciones: Conversacione;
+    ensayos: Ensayo;
     categorias: Categoria;
+    eventos: Evento;
+    conversaciones: Conversacione;
+    media: Media;
     invitaciones: Invitacione;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -83,12 +83,12 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
-    ensayos: EnsayosSelect<false> | EnsayosSelect<true>;
-    eventos: EventosSelect<false> | EventosSelect<true>;
     autores: AutoresSelect<false> | AutoresSelect<true>;
-    conversaciones: ConversacionesSelect<false> | ConversacionesSelect<true>;
+    ensayos: EnsayosSelect<false> | EnsayosSelect<true>;
     categorias: CategoriasSelect<false> | CategoriasSelect<true>;
+    eventos: EventosSelect<false> | EventosSelect<true>;
+    conversaciones: ConversacionesSelect<false> | ConversacionesSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     invitaciones: InvitacionesSelect<false> | InvitacionesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -162,6 +162,25 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "autores".
+ */
+export interface Autore {
+  id: string;
+  nombre: string;
+  foto?: (string | null) | Media;
+  /**
+   * Semblanza del autor, contexto histórico o perfil académico.
+   */
+  biografia?: string | null;
+  /**
+   * Víncula este perfil con una cuenta de usuario si aplica.
+   */
+  usuarioAsociado?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
@@ -222,25 +241,6 @@ export interface Ensayo {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "autores".
- */
-export interface Autore {
-  id: string;
-  nombre: string;
-  foto?: (string | null) | Media;
-  /**
-   * Semblanza del autor, contexto histórico o perfil académico.
-   */
-  biografia?: string | null;
-  /**
-   * Víncula este perfil con una cuenta de usuario si aplica.
-   */
-  usuarioAsociado?: (string | null) | User;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -354,28 +354,28 @@ export interface PayloadLockedDocument {
         value: string | User;
       } | null)
     | ({
-        relationTo: 'media';
-        value: string | Media;
+        relationTo: 'autores';
+        value: string | Autore;
       } | null)
     | ({
         relationTo: 'ensayos';
         value: string | Ensayo;
       } | null)
     | ({
-        relationTo: 'eventos';
-        value: string | Evento;
+        relationTo: 'categorias';
+        value: string | Categoria;
       } | null)
     | ({
-        relationTo: 'autores';
-        value: string | Autore;
+        relationTo: 'eventos';
+        value: string | Evento;
       } | null)
     | ({
         relationTo: 'conversaciones';
         value: string | Conversacione;
       } | null)
     | ({
-        relationTo: 'categorias';
-        value: string | Categoria;
+        relationTo: 'media';
+        value: string | Media;
       } | null)
     | ({
         relationTo: 'invitaciones';
@@ -450,21 +450,15 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "autores_select".
  */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
+export interface AutoresSelect<T extends boolean = true> {
+  nombre?: T;
+  foto?: T;
+  biografia?: T;
+  usuarioAsociado?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -488,22 +482,22 @@ export interface EnsayosSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "eventos_select".
+ * via the `definition` "categorias_select".
  */
-export interface EventosSelect<T extends boolean = true> {
-  titulo?: T;
+export interface CategoriasSelect<T extends boolean = true> {
+  nombre?: T;
+  slug?: T;
+  categoriaPadre?: T;
+  colorAcento?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "autores_select".
+ * via the `definition` "eventos_select".
  */
-export interface AutoresSelect<T extends boolean = true> {
-  nombre?: T;
-  foto?: T;
-  biografia?: T;
-  usuarioAsociado?: T;
+export interface EventosSelect<T extends boolean = true> {
+  titulo?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -522,15 +516,21 @@ export interface ConversacionesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categorias_select".
+ * via the `definition` "media_select".
  */
-export interface CategoriasSelect<T extends boolean = true> {
-  nombre?: T;
-  slug?: T;
-  categoriaPadre?: T;
-  colorAcento?: T;
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
   updatedAt?: T;
   createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

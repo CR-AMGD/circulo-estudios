@@ -28,10 +28,9 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      // Reemplazamos la vista predeterminada de login por nuestro componente con visor de contraseña
       views: {
         login: {
-          Component: '/components/CustomLogin#default',
+          Component: '@/components/CustomLogin#default',
         },
       },
       actions: ['/components/AdminHeader/CustomHeader#CustomHeader'],
@@ -45,7 +44,17 @@ export default buildConfig({
       ],
     },
   },
-  collections: [Users, Media, Ensayos, Eventos, Autores, Conversaciones, Categorias, Invitaciones,],
+  // <--- Orden ajustado exactamente como lo solicitaste
+  collections: [
+    Users,
+    Autores,
+    Ensayos,
+    Categorias,
+    Eventos,
+    Conversaciones,
+    Media,
+    Invitaciones,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

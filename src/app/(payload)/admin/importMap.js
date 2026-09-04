@@ -27,7 +27,7 @@ import { default as default_dd0f1f8d7a92af048df15cce627738c2 } from '@/component
 import { AdminHeaderTitle as AdminHeaderTitle_d492ba758a0d381d6e1b42ae6bd77827 } from '../../../components/AdminHeaderTitle'
 import { CustomHeader as CustomHeader_b3c7c1720d542ad8f441aad5b540821f } from '../../../components/AdminHeader/CustomHeader'
 import { CustomNav as CustomNav_08f8d6e2c9ac078ca91e21ca40197033 } from '../../../components/AdminNav/CustomNav'
-import { default as default_e0ceb5dcec10c5587ac13a6be1d6aef4 } from '../../../components/CustomLogin'
+import { default as default_9d596c84849fe434056b6569856241b2 } from '@/components/CustomLogin'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -61,6 +61,6 @@ export const importMap = {
   "/components/AdminHeaderTitle#AdminHeaderTitle": AdminHeaderTitle_d492ba758a0d381d6e1b42ae6bd77827,
   "/components/AdminHeader/CustomHeader#CustomHeader": CustomHeader_b3c7c1720d542ad8f441aad5b540821f,
   "/components/AdminNav/CustomNav#CustomNav": CustomNav_08f8d6e2c9ac078ca91e21ca40197033,
-  "/components/CustomLogin#default": default_e0ceb5dcec10c5587ac13a6be1d6aef4,
+  "@/components/CustomLogin#default": default_9d596c84849fe434056b6569856241b2,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }
