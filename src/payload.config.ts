@@ -20,7 +20,7 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
-    theme: 'dark', // <--- Forzar el modo oscuro en el panel de administración y login
+    theme: 'dark',
     meta: {
       titleSuffix: '- Círculo de Estudios Luis María Grignion de Montfort',
     },
@@ -28,13 +28,18 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
+      // Reemplazamos la vista predeterminada de login por nuestro componente con visor de contraseña
+      views: {
+        login: {
+          Component: '/components/CustomLogin#default',
+        },
+      },
       actions: ['/components/AdminHeader/CustomHeader#CustomHeader'],
       graphics: {
         Logo: {
           path: '/components/AdminHeaderTitle#AdminHeaderTitle',
         },
       },
-      // Lista única de componentes al final de la navegación lateral
       afterNavLinks: [
         '/components/AdminNav/CustomNav#CustomNav',
       ],
