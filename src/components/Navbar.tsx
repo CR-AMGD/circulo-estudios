@@ -21,7 +21,6 @@ export function Navbar({ user, forceActiveSection }: NavbarProps) {
 
   const [forceAmbar, setForceAmbar] = useState(false)
 
-  // Sincronizar el estado inicial recibido desde el servidor con el prop forceActiveSection
   useEffect(() => {
     if (forceActiveSection === 'epopeya-cristera') {
       setForceAmbar(true)
@@ -30,14 +29,11 @@ export function Navbar({ user, forceActiveSection }: NavbarProps) {
     }
   }, [forceActiveSection, pathname])
 
-  // Escuchar si la página hija activa el modo ámbar por pertenecer a Anacleto vía evento del cliente
   useEffect(() => {
     const handleForceAmbar = (e: CustomEvent) => {
       setForceAmbar(e.detail?.active ?? false)
     }
-
     window.addEventListener('set-navbar-ambar' as any, handleForceAmbar)
-
     return () => {
       window.removeEventListener('set-navbar-ambar' as any, handleForceAmbar)
     }
@@ -50,36 +46,34 @@ export function Navbar({ user, forceActiveSection }: NavbarProps) {
     <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-      {/* Círculo de Estudios con Icono Más Grande */}
-      <Link 
-        href="/" 
-        className="flex items-center gap-3 group no-underline"
-      >
-        <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
-          <Image
-            src="/logo.svg"
-            alt="Círculo de Estudios"
-            width={40}
-            height={40}
-            className="w-10 h-10 object-contain transition-transform duration-200 group-hover:scale-105"
-            priority
-          />
-        </div>
+        {/* Logo y Título */}
+        <Link href="/" className="flex items-center gap-3 group no-underline min-w-0">
+          <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+            <Image
+              src="/logo.svg"
+              alt="Círculo de Estudios"
+              width={40}
+              height={40}
+              className="w-10 h-10 object-contain transition-transform duration-200 group-hover:scale-105"
+              priority
+            />
+          </div>
 
-        <div className="flex flex-col text-left">
-          <span className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors leading-tight">
-            Círculo de Estudios
-          </span>
-          <span className="text-[11px] font-medium text-[#38bdf8] tracking-wide leading-tight">
-            Luis María Grignion de Montfort
-          </span>
-        </div>
-      </Link>
+          <div className="flex flex-col text-left min-w-0">
+            <span className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors leading-tight truncate">
+              Círculo de Estudios
+            </span>
+            <span className="text-[11px] font-medium text-[#38bdf8] tracking-wide leading-tight truncate">
+              Luis María Grignion de Montfort
+            </span>
+          </div>
+        </Link>
 
-        {/* Enlaces de Navegación */}
-        <nav className="flex items-center gap-4 text-sm font-medium">
+        {/* ========================================================= */}
+        {/* NAVEGACIÓN DE ESCRITORIO (Hover intacto)                   */}
+        {/* ========================================================= */}
+        <nav className="hidden sm:flex items-center gap-4 text-sm font-medium">
           
-          {/* Menú Desplegable: Epopeya Cristera (Dorado/Ámbar) */}
           <div className="relative group">
             <button
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all cursor-pointer ${
@@ -106,7 +100,6 @@ export function Navbar({ user, forceActiveSection }: NavbarProps) {
               </svg>
             </button>
 
-            {/* Submenú Flotante */}
             <div className="absolute left-0 mt-1 w-64 bg-neutral-900 border border-neutral-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
               <Link
                 href="/epopeya-cristera/anacleto-gonzalez-flores"
@@ -122,7 +115,6 @@ export function Navbar({ user, forceActiveSection }: NavbarProps) {
             </div>
           </div>
 
-          {/* Ensayos -> Cuadro sin fondo Cyan en Hover y Activo */}
           <Link 
             href="/ensayos" 
             className={`px-3 py-1.5 rounded-md border transition-all ${
@@ -134,9 +126,64 @@ export function Navbar({ user, forceActiveSection }: NavbarProps) {
             Ensayos
           </Link>
 
-          {/* Menú de usuario */}
           <UserMenu user={user} />
         </nav>
+
+        {/* ========================================================= */}
+        {/* NAVEGACIÓN MÓVIL (Basada en <details> nativo sin fallos)    */}
+        {/* ========================================================= */}
+        <div className="flex sm:hidden items-center gap-2">
+          <UserMenu user={user} />
+
+          <details className="group relative">
+            <summary className="list-none p-2.5 rounded-lg bg-neutral-900 text-white border border-neutral-700 active:scale-95 transition-all cursor-pointer flex items-center justify-center select-none">
+              {/* Icono Hamburguesa */}
+              <svg className="w-6 h-6 group-open:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+              {/* Icono Cerrar (X) */}
+              <svg className="w-6 h-6 hidden group-open:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </summary>
+
+            {/* Panel Desplegable Móvil */}
+            <div className="absolute right-0 top-12 w-[calc(100vw-2rem)] max-w-xs bg-neutral-950 border border-neutral-800 rounded-2xl p-4 shadow-2xl z-[99999] space-y-3">
+              
+              <details className="group/sub">
+                <summary className="list-none w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium text-neutral-200 bg-neutral-900 border border-neutral-800 cursor-pointer">
+                  <span>Epopeya Cristera</span>
+                  <svg
+                    className="w-4 h-4 transition-transform duration-200 group-open/sub:rotate-180"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+
+                <div className="pl-3 mt-2 space-y-1 border-l border-neutral-800 ml-2">
+                  <Link
+                    href="/epopeya-cristera/anacleto-gonzalez-flores"
+                    className="block px-3.5 py-3 rounded-lg text-xs text-neutral-300 hover:text-amber-400 bg-neutral-900 border border-neutral-800"
+                  >
+                    <div className="font-semibold text-white">Beato Anacleto González Flores</div>
+                    <div className="text-[10px] text-neutral-400 mt-0.5">Vida, escritos y legado de los mártires</div>
+                  </Link>
+                </div>
+              </details>
+
+              <Link
+                href="/ensayos"
+                className="block px-4 py-3 rounded-xl text-sm font-medium text-neutral-200 bg-neutral-900 border border-neutral-800 text-center"
+              >
+                Ensayos
+              </Link>
+
+            </div>
+          </details>
+        </div>
 
       </div>
     </header>
