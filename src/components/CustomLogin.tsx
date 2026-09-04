@@ -8,6 +8,28 @@ export default function CustomLogin() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Manejador sincronizado para el campo de email
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    if (val === '') {
+      setEmail('')
+      setPassword('')
+    } else {
+      setEmail(val)
+    }
+  }
+
+  // Manejador sincronizado para el campo de contraseña
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value
+    if (val === '') {
+      setEmail('')
+      setPassword('')
+    } else {
+      setPassword(val)
+    }
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -42,8 +64,8 @@ export default function CustomLogin() {
           src="/dieu_de_roi-removebg-preview.png"
           alt="Círculo de Estudios Logo"
           style={{
-            width: '240px',
-            height: '240px',
+            width: '130px',
+            height: '130px',
             objectFit: 'contain',
             marginBottom: '8px',
             display: 'block',
@@ -81,7 +103,7 @@ export default function CustomLogin() {
               type="email"
               placeholder="tucorreo@ejemplo.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               required
               style={{ width: '100%', padding: '12px 14px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#fff', boxSizing: 'border-box' }}
             />
@@ -96,7 +118,7 @@ export default function CustomLogin() {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••••••"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 required
                 style={{ width: '100%', padding: '12px 42px 12px 14px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', fontSize: '14px', outline: 'none', color: '#fff', boxSizing: 'border-box' }}
               />
