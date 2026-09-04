@@ -20,6 +20,7 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     user: Users.slug,
+    theme: 'dark', // <--- Forzar el modo oscuro en el panel de administración y login
     meta: {
       titleSuffix: '- Círculo de Estudios Luis María Grignion de Montfort',
     },

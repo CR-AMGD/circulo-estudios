@@ -52,6 +52,10 @@ export const Invitaciones: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Copia este enlace completo para enviarlo por WhatsApp:',
+        components: {
+          // Inyectamos nuestro componente personalizado justo debajo del input
+          Field: '@/components/EnlaceInvitacionField',
+        },
       },
       hooks: {
         afterRead: [
