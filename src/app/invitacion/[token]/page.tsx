@@ -11,7 +11,9 @@ export default function PaginaInvitacionGeneral() {
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [nombreAutor, setNombreAutor] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -32,8 +34,19 @@ export default function PaginaInvitacionGeneral() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError('')
+
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden. Por favor, revísalas.')
+      return
+    }
+
+    if (password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres.')
+      return
+    }
+
+    setLoading(true)
 
     try {
       const res = await fetch('/api/invitaciones/registrar', {
@@ -77,7 +90,7 @@ export default function PaginaInvitacionGeneral() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0b0b0b', padding: '20px', color: '#fff' }}>
       
-      {/* Cabecera idéntica al AdminHeaderTitle */}
+      {/* Cabecera institucional */}
       <div style={{ textAlign: 'center', marginBottom: '24px', width: '100%', maxWidth: '420px' }}>
         <img
           src="/dieu_de_roi-removebg-preview.png"
@@ -142,18 +155,58 @@ export default function PaginaInvitacionGeneral() {
             />
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
+          {/* Campo Contraseña con botón de ojo */}
+          <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '6px', color: '#ccc' }}>
               Contraseña <span style={{ color: '#ef4444' }}>*</span>
             </label>
-            <input
-              type="password"
-              placeholder="••••••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{ width: '100%', padding: '10px 12px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', fontSize: '13px', outline: 'none', color: '#fff', boxSizing: 'border-box' }}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px 38px 10px 12px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', fontSize: '13px', outline: 'none', color: '#fff', boxSizing: 'border-box' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', color: '#888', display: 'flex', alignItems: 'center', padding: '4px' }}
+                title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? (
+                  /* Icono Ojo Cerrado */
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                ) : (
+                  /* Icono Ojo Abierto */
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Campo Confirmar Contraseña */}
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, marginBottom: '6px', color: '#ccc' }}>
+              Confirmar Contraseña <span style={{ color: '#ef4444' }}>*</span>
+            </label>
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                style={{ width: '100%', padding: '10px 12px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '6px', fontSize: '13px', outline: 'none', color: '#fff', boxSizing: 'border-box' }}
+              />
+            </div>
           </div>
 
           <button
