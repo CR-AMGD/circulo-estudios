@@ -12,6 +12,7 @@ import { Eventos } from './collections/Eventos'
 import { Autores } from './collections/Autores'
 import { Conversaciones } from './collections/Conversaciones'
 import { Categorias } from './collections/Categorias'
+import { Invitaciones } from './collections/Invitaciones'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -38,7 +39,7 @@ export default buildConfig({
       ],
     },
   },
-  collections: [Users, Media, Ensayos, Eventos, Autores, Conversaciones, Categorias],
+  collections: [Users, Media, Ensayos, Eventos, Autores, Conversaciones, Categorias, Invitaciones,],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

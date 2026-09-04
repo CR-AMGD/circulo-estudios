@@ -74,6 +74,7 @@ export interface Config {
     autores: Autore;
     conversaciones: Conversacione;
     categorias: Categoria;
+    invitaciones: Invitacione;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     autores: AutoresSelect<false> | AutoresSelect<true>;
     conversaciones: ConversacionesSelect<false> | ConversacionesSelect<true>;
     categorias: CategoriasSelect<false> | CategoriasSelect<true>;
+    invitaciones: InvitacionesSelect<false> | InvitacionesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -194,7 +196,7 @@ export interface Ensayo {
    */
   categoria?: (string | null) | Categoria;
   /**
-   * Texto base del cual surge esta réplica, adenda o respuesta.
+   * Texto base al cual responde este ensayo.
    */
   parentEssay?: (string | null) | Ensayo;
   conversacion?: (string | null) | Conversacione;
@@ -300,6 +302,31 @@ export interface Evento {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invitaciones".
+ */
+export interface Invitacione {
+  id: string;
+  /**
+   * Nombre de referencia para identificar este enlace.
+   */
+  titulo: string;
+  /**
+   * Desactiva este interruptor para bloquear instantáneamente nuevos registros.
+   */
+  activo?: boolean | null;
+  /**
+   * Modifica este identificador si deseas cambiar la ruta final del enlace.
+   */
+  token: string;
+  /**
+   * Copia este enlace completo para enviarlo por WhatsApp:
+   */
+  enlaceCompleto?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -349,6 +376,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'categorias';
         value: string | Categoria;
+      } | null)
+    | ({
+        relationTo: 'invitaciones';
+        value: string | Invitacione;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -498,6 +529,18 @@ export interface CategoriasSelect<T extends boolean = true> {
   slug?: T;
   categoriaPadre?: T;
   colorAcento?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "invitaciones_select".
+ */
+export interface InvitacionesSelect<T extends boolean = true> {
+  titulo?: T;
+  activo?: T;
+  token?: T;
+  enlaceCompleto?: T;
   updatedAt?: T;
   createdAt?: T;
 }

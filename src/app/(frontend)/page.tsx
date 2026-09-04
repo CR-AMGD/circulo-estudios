@@ -121,7 +121,7 @@ export default async function HomePage() {
 
       {/* Footer */}
       <footer className="border-t border-neutral-900 py-8 text-center text-xs text-neutral-600">
-        <p>© {new Date().getFullYear()} Círculo de Estudios. Desarrollado con Next.js & Payload CMS.</p>
+        <p>© {new Date().getFullYear()} Círculo de Estudios. Luis María Grignion de Montfort. V 1.0 // 3 Septiembre 2026</p>
       </footer>
     </div>
   )
