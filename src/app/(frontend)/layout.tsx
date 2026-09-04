@@ -5,6 +5,12 @@ import { headers } from 'next/headers'
 import { Navbar } from '@/components/Navbar'
 import './styles.css'
 
+// Definición de las props del Navbar con soporte para la sección forzada
+export interface NavbarProps {
+  user?: any
+  forceActiveSection?: 'epopeya-cristera' | 'ensayos' | null
+}
+
 export const metadata = {
   description: 'Repositorio digital del círculo de estudios. Transcripciones, análisis filosófico, histórico y convocatorias abiertas.',
   title: 'Círculo de Estudios Luis María Grignion de Montfort',

@@ -117,7 +117,7 @@ export default function PaginaInvitacionGeneral() {
       <div style={{ maxWidth: '420px', width: '100%', padding: '32px', background: '#141414', borderRadius: '8px', border: '1px solid #222', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
         <h2 style={{ marginBottom: '6px', fontSize: '16px', fontWeight: 600, color: '#fff' }}>Registro de Colaborador</h2>
         <p style={{ fontSize: '12px', color: '#888', marginBottom: '24px', lineHeight: '1.4' }}>
-          Completa tus datos para unirte a la plataforma y comenzar a redactar o investigar.
+          Completa tus datos para unirte a la plataforma y comenzar a redactar e investigar.
         </p>
 
         {error && (

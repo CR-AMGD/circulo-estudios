@@ -6,38 +6,45 @@ import { usePathname } from 'next/navigation'
 import { UserMenu } from './UserMenu'
 import { useState, useEffect } from 'react'
 
-interface NavbarProps {
+export interface NavbarProps {
   user?: {
     email: string
     nombre?: string
     rol?: string
   } | null
+  forceActiveSection?: 'epopeya-cristera' | 'ensayos' | null
 }
 
-export function Navbar({ user }: NavbarProps) {
+export function Navbar({ user, forceActiveSection }: NavbarProps) {
   const rawPathname = usePathname()
   const pathname = (rawPathname || '').toLowerCase()
 
   const [forceAmbar, setForceAmbar] = useState(false)
 
-  // Escuchar si la página hija activa el modo ámbar por pertenecer a Anacleto
+  // Sincronizar el estado inicial recibido desde el servidor con el prop forceActiveSection
+  useEffect(() => {
+    if (forceActiveSection === 'epopeya-cristera') {
+      setForceAmbar(true)
+    } else {
+      setForceAmbar(false)
+    }
+  }, [forceActiveSection, pathname])
+
+  // Escuchar si la página hija activa el modo ámbar por pertenecer a Anacleto vía evento del cliente
   useEffect(() => {
     const handleForceAmbar = (e: CustomEvent) => {
       setForceAmbar(e.detail?.active ?? false)
     }
 
     window.addEventListener('set-navbar-ambar' as any, handleForceAmbar)
-    
-    // Resetear al cambiar de ruta general
-    setForceAmbar(false)
 
     return () => {
       window.removeEventListener('set-navbar-ambar' as any, handleForceAmbar)
     }
-  }, [pathname])
+  }, [])
 
-  const isEpopeyaActive = forceAmbar || pathname.includes('epopeya-cristera')
-  const isEnsayosActive = pathname.includes('ensayo') && !isEpopeyaActive
+  const isEpopeyaActive = forceAmbar || pathname.includes('epopeya-cristera') || forceActiveSection === 'epopeya-cristera'
+  const isEnsayosActive = (pathname.includes('ensayo') || forceActiveSection === 'ensayos') && !isEpopeyaActive
 
   return (
     <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur sticky top-0 z-50">

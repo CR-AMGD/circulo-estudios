@@ -41,7 +41,7 @@ export const Ensayos: CollectionConfig = {
           { autorRef: { equals: req.user.id } },
           { 'autor.nombre': { equals: 'Beato Anacleto González Flores' } },
         ],
-      }
+      } as any
     },
   },
 
@@ -57,7 +57,7 @@ export const Ensayos: CollectionConfig = {
             { 'autor.nombre': { equals: 'Beato Anacleto González Flores' } },
           ],
         }
-        return query
+        return query as any
       }
 
       const queryPublic: Where = {
@@ -123,7 +123,6 @@ export const Ensayos: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Texto base al cual responde este ensayo.',
-        // Apunta directamente a la exportación por defecto de nuestro selector con lupa y modal
         components: {
           Field: '@/components/ParentEssaySelector',
         },

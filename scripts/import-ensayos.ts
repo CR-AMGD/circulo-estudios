@@ -123,8 +123,8 @@ const importEnsayos = async () => {
         data: {
           titulo: ensayo.titulo,
           autorRef: adminUser.id,
-          autor: autoresIds,
-          categoria: categoriaId,
+          autor: autoresIds as any,
+          categoria: categoriaId as any,
           resumen: ensayo.resumen || `Capítulo perteneciente a ${metadata.pdf_fuente || 'la obra'}.`,
           contenido: ensayo.contenido,
           fechaPublicacion: fechaEnsayo,

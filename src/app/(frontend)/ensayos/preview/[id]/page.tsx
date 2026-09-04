@@ -41,7 +41,7 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
       {/* BANNER FLOTANTE DE VISTA PREVIA Y ACCIONES */}
       <div className="sticky top-16 z-40 bg-neutral-900/90 backdrop-blur border-b border-neutral-800 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/20">
             👁 Modo Vista Previa ({ensayo._status === 'published' ? 'Publicado' : 'Borrador'})
           </span>
           <p className="text-xs text-neutral-400 hidden sm:block">
@@ -72,7 +72,9 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
       <article className="max-w-3xl mx-auto px-4 py-12">
         <header className="mb-8 border-b border-neutral-800 pb-8">
           <p className="text-xs uppercase tracking-widest text-[#38bdf8] font-semibold mb-2">
-            {ensayo.categoria}
+            {typeof ensayo.categoria === 'object' && ensayo.categoria !== null
+              ? (ensayo.categoria as any).nombre
+              : String(ensayo.categoria || 'Sin categoría')}
           </p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4 leading-tight">
             {ensayo.titulo}
