@@ -7,6 +7,7 @@ import { RichText } from '@payloadcms/richtext-lexical/react'
 import { formatearFecha } from '@/utils/formatearFecha'
 import { EnsayoLayout } from '@/components/EnsayoLayout'
 import { SetNavbarActive } from '@/components/SetNavbarActive'
+import { ShareButton } from '@/components/ShareButton'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -167,11 +168,16 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
         {/* Contenedor Interactivo con Botón para Ocultar/Mostrar */}
         <EnsayoLayout sidebarContent={sidebarContent} tieneMetadata={tieneMetadata}>
           <header className="border-b border-neutral-800 pb-6">
-            {ensayo.fechaPublicacion && (
-              <p className="text-xs font-mono text-neutral-500 mb-2">
-                Publicado el {formatearFecha(ensayo.fechaPublicacion)}
-              </p>
-            )}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
+              {ensayo.fechaPublicacion && (
+                <p className="text-xs font-mono text-neutral-500">
+                  Publicado el {formatearFecha(ensayo.fechaPublicacion)}
+                </p>
+              )}
+              {/* Botón de Compartir / Copiar Link */}
+              <ShareButton />
+            </div>
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-4 leading-tight">
               {ensayo.titulo}
             </h1>
@@ -215,4 +221,4 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
       </div>
     </article>
   )
-} 
+}
