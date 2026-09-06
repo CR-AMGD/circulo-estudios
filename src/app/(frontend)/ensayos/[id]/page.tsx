@@ -32,6 +32,42 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
     notFound()
   }
 
+  // ==========================================
+  // CONSULTA DE ENSAYO ANTERIOR Y SIGUIENTE
+  // ==========================================
+  const fechaActual = ensayo.fechaPublicacion || new Date().toISOString()
+
+  // Buscar el ensayo anterior (publicado antes que este)
+  const prevQuery = await payload.find({
+    collection: 'ensayos',
+    where: {
+      and: [
+        { _status: { equals: 'published' } },
+        { fechaPublicacion: { less_than: fechaActual } },
+        { id: { not_equals: ensayo.id } }
+      ]
+    },
+    sort: '-fechaPublicacion',
+    limit: 1,
+  })
+
+  // Buscar el ensayo siguiente (publicado después que este)
+  const nextQuery = await payload.find({
+    collection: 'ensayos',
+    where: {
+      and: [
+        { _status: { equals: 'published' } },
+        { fechaPublicacion: { greater_than: fechaActual } },
+        { id: { not_equals: ensayo.id } }
+      ]
+    },
+    sort: 'fechaPublicacion',
+    limit: 1,
+  })
+
+  const prevEnsayo = prevQuery.docs[0] || null
+  const nextEnsayo = nextQuery.docs[0] || null
+
   // Normalización de relaciones
   const autores = Array.isArray(ensayo.autor) ? ensayo.autor : [ensayo.autor].filter(Boolean)
   const cat = ensayo.categoria
@@ -218,6 +254,43 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
             )}
           </div>
         </EnsayoLayout>
+
+        {/* ========================================== */}
+        {/* NAVEGACIÓN: ENSAYO ANTERIOR Y SIGUIENTE     */}
+        {/* ========================================== */}
+        <footer className="mt-16 pt-8 border-t border-neutral-800/80 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto">
+          {prevEnsayo ? (
+            <Link
+              href={`/ensayos/${prevEnsayo.id}`}
+              className={`p-4 rounded-xl bg-neutral-900/60 border border-neutral-800 hover:border-neutral-700 transition-all group flex flex-col justify-between ${hoverGroupColor}`}
+            >
+              <span className="text-[11px] font-mono text-neutral-500 uppercase tracking-wider mb-1">
+                ← Ensayo Anterior
+              </span>
+              <p className="text-sm font-semibold text-neutral-200 line-clamp-2 group-hover:text-white">
+                {prevEnsayo.titulo}
+              </p>
+            </Link>
+          ) : (
+            <div />
+          )}
+
+          {nextEnsayo ? (
+            <Link
+              href={`/ensayos/${nextEnsayo.id}`}
+              className={`p-4 rounded-xl bg-neutral-900/60 border border-neutral-800 hover:border-neutral-700 transition-all group flex flex-col justify-between text-right ${hoverGroupColor}`}
+            >
+              <span className="text-[11px] font-mono text-neutral-500 uppercase tracking-wider mb-1">
+                Ensayo Siguiente →
+              </span>
+              <p className="text-sm font-semibold text-neutral-200 line-clamp-2 group-hover:text-white">
+                {nextEnsayo.titulo}
+              </p>
+            </Link>
+          ) : (
+            <div />
+          )}
+        </footer>
       </div>
     </article>
   )
