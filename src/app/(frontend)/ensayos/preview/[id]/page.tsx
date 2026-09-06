@@ -3,6 +3,7 @@ import config from '@payload-config'
 import { headers } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { Ensayo } from '@/payload-types'
 
 interface PreviewPageProps {
@@ -50,20 +51,12 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Botón Volver a Editar */}
+          {/* Botón único de Volver a Edición */}
           <Link
             href={`/admin/collections/ensayos/${ensayo.id}`}
-            className="px-3 py-1.5 rounded-md text-xs font-medium bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-white transition-colors"
+            className="px-3.5 py-1.5 rounded-md text-xs font-medium bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-white transition-colors flex items-center gap-2"
           >
-            ✏️ Volver a Editar
-          </Link>
-
-          {/* Botón Publicar Directo */}
-          <Link
-            href={`/admin/collections/ensayos/${ensayo.id}`}
-            className="px-3 py-1.5 rounded-md text-xs font-medium bg-[#38bdf8] hover:bg-[#0284c7] text-neutral-950 font-semibold transition-colors"
-          >
-            🚀 Ir a Publicar
+            <span>✏️</span> Volver a Edición
           </Link>
         </div>
       </div>
@@ -111,11 +104,11 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
           </div>
         )}
 
-        <div className="prose prose-invert max-w-none text-neutral-200">
-          {/* Renderizado de contenido */}
-          <p className="whitespace-pre-wrap">
-            {typeof ensayo.contenido === 'string' ? ensayo.contenido : 'Contenido del borrador...'}
-          </p>
+        <div className="prose prose-invert max-w-none text-neutral-200 space-y-4">
+          {/* Renderizado correcto del editor Lexical */}
+          {ensayo.contenido && (
+            <RichText data={ensayo.contenido} />
+          )}
         </div>
       </article>
     </div>

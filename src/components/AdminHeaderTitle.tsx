@@ -1,6 +1,24 @@
-import React from 'react'
+'use client';
+
+import React, { useState, useEffect } from 'react';
 
 export const AdminHeaderTitle: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkResponsive = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkResponsive();
+    window.addEventListener('resize', checkResponsive);
+
+    return () => window.removeEventListener('resize', checkResponsive);
+  }, []);
+
+  const logoSize = isMobile ? '120px' : '280px';
+  const logoMarginBottom = isMobile ? '8px' : '4px';
+
   return (
     <div style={{
       display: 'flex',
@@ -10,30 +28,31 @@ export const AdminHeaderTitle: React.FC = () => {
       textAlign: 'center',
       width: '100%',
       margin: '0 auto',
-      paddingBottom: '4px'
+      paddingBottom: '4px',
+      paddingTop: isMobile ? '16px' : '4px',
     }}>
-      {/* Icono del corazón a 280px */}
       <img
         src="/dieu_de_roi-removebg-preview.png"
         alt="Círculo de Estudios Logo"
         style={{
-          width: '280px',
-          height: '280px',
+          width: logoSize,
+          height: logoSize,
           objectFit: 'contain',
-          marginBottom: '4px', // Reducido para acercar el texto de manera sutil
+          marginBottom: logoMarginBottom,
           display: 'block',
           marginLeft: 'auto',
-          marginRight: 'auto'
+          marginRight: 'auto',
+          transition: 'all 0.3s ease-in-out',
         }}
       />
 
-      {/* Textos institucionales organizados */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '100%'
+        width: '100%',
+        maxWidth: '400px',
       }}>
         <div style={{
           fontSize: '17px',
@@ -57,5 +76,5 @@ export const AdminHeaderTitle: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

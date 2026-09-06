@@ -31,6 +31,14 @@ export const Ensayos: CollectionConfig = {
       return null
     },
 
+    components: {
+      edit: {
+        beforeDocumentControls: [
+          '@/components/ViewOnSiteButton#ViewOnSiteButton',
+        ],
+      },
+    },
+
     // Si es colaborador, filtramos la lista en el panel para que vea los suyos o los de Anacleto
     baseListFilter: ({ req }) => {
       if (req?.user?.rol === 'admin') return null
