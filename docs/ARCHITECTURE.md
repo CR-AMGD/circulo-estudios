@@ -7,8 +7,7 @@
 src/
 ├── app/
 │   ├── (frontend)/       # Rutas públicas (App Router), Server Components y Previews
-│   ├── (payload)/        # Interfaz de administración nativa de Payload CMS v3
-│   └── my-route/         # Endpoints de prueba / custom routes
+│   └── (payload)/        # Interfaz de administración nativa de Payload CMS v3
 ├── collections/          # Esquemas y lógica de acceso de Payload CMS
 ├── components/           # Componentes modulares UI
 │   ├── AdminHeader/      # Componentes extendidos para la UI del Admin Panel
