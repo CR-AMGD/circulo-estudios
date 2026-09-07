@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { UserMenu } from './UserMenu'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export interface NavbarProps {
   user?: {
@@ -19,25 +19,29 @@ export function Navbar({ user, forceActiveSection }: NavbarProps) {
   const rawPathname = usePathname()
   const pathname = (rawPathname || '').toLowerCase()
 
-  const [forceAmbar, setForceAmbar] = useState(false)
+  // La sección "epopeya" también puede activarse mediante un evento global
+  // (`set-navbar-ambar`). Guardamos la clave de ruta en la que se activó, de forma que
+  // el override caduca solo al navegar a otra sección, sin un efecto que llame a setState.
+  const sectionKey = `${forceActiveSection ?? ''}|${pathname}`
+  const sectionKeyRef = useRef(sectionKey)
+  const [ambarEventKey, setAmbarEventKey] = useState<string | null>(null)
 
   useEffect(() => {
-    if (forceActiveSection === 'epopeya-cristera') {
-      setForceAmbar(true)
-    } else {
-      setForceAmbar(false)
-    }
-  }, [forceActiveSection, pathname])
+    sectionKeyRef.current = sectionKey
+  }, [sectionKey])
 
   useEffect(() => {
-    const handleForceAmbar = (e: CustomEvent) => {
-      setForceAmbar(e.detail?.active ?? false)
+    const handleForceAmbar = (e: Event) => {
+      const active = (e as CustomEvent).detail?.active ?? false
+      setAmbarEventKey(active ? sectionKeyRef.current : null)
     }
-    window.addEventListener('set-navbar-ambar' as any, handleForceAmbar)
+    window.addEventListener('set-navbar-ambar', handleForceAmbar)
     return () => {
-      window.removeEventListener('set-navbar-ambar' as any, handleForceAmbar)
+      window.removeEventListener('set-navbar-ambar', handleForceAmbar)
     }
   }, [])
+
+  const forceAmbar = ambarEventKey === sectionKey
 
   const isEpopeyaActive = forceAmbar || pathname.includes('epopeya-cristera') || forceActiveSection === 'epopeya-cristera'
   const isEnsayosActive = (pathname.includes('ensayo') || forceActiveSection === 'ensayos') && !isEpopeyaActive

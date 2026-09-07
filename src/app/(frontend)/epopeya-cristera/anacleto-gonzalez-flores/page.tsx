@@ -69,7 +69,7 @@ export default async function AnacletoPage() {
           Beato Anacleto González Flores
         </h1>
         <p className="text-neutral-400 mt-2 text-sm leading-relaxed">
-          Recopilación de escritos, ensayos y discursos del "Maestro Cleto".
+          Recopilación de escritos, ensayos y discursos del &ldquo;Maestro Cleto&rdquo;.
         </p>
       </header>
 
