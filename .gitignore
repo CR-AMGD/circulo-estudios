@@ -49,6 +49,9 @@ test.env
 /*.sqlite
 .payload/
 
+# MongoDB dumps (mongodump/mongorestore, ver docs/LOCAL_DB.md)
+/dump
+
 # Playwright
 /test-results/
 /playwright-report/
