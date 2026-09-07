@@ -23,7 +23,7 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
   const [authors, setAuthors] = useState<Autor[]>([])
   const [ensayos, setEnsayos] = useState<Ensayo[]>([])
   const [loading, setLoading] = useState(false)
-  const [selectedTitle, setSelectedTitle] = useState<string>('')
+  const [fetchedTitle, setFetchedTitle] = useState<string>('')
   const [isModalOpenState, setIsModalOpenState] = useState(false)
 
   const handleOpenModal = () => {
@@ -79,21 +79,27 @@ export default function ParentEssaySelector({ path, label, field }: { path: stri
     }
   }, [searchQuery, selectedAuthorId, isModalOpenState])
 
-  // Obtener el título del ensayo seleccionado previamente
+  // Obtener el título del ensayo seleccionado previamente (solo cuando hay valor)
   useEffect(() => {
-    if (value) {
-      fetch(`/api/ensayos/${value}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.titulo) {
-            setSelectedTitle(data.titulo)
-          }
-        })
-        .catch(() => setSelectedTitle(value))
-    } else {
-      setSelectedTitle('')
+    if (!value) return
+    let cancelled = false
+    fetch(`/api/ensayos/${value}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && data && data.titulo) {
+          setFetchedTitle(data.titulo)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFetchedTitle(value)
+      })
+    return () => {
+      cancelled = true
     }
   }, [value])
+
+  // Sin valor seleccionado no hay título que mostrar.
+  const selectedTitle = value ? fetchedTitle : ''
 
   return (
     <div style={{ marginBottom: '1.5rem' }}>

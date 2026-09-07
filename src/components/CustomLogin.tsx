@@ -1,5 +1,6 @@
 'use client'
 import React, { useState } from 'react'
+import Link from 'next/link'
 
 export default function CustomLogin() {
   const [email, setEmail] = useState('')
@@ -144,9 +145,9 @@ export default function CustomLogin() {
           </div>
 
           <div style={{ marginBottom: '24px', textAlign: 'right' }}>
-            <a href="/admin/forgot" style={{ fontSize: '12px', color: '#38bdf8', textDecoration: 'none' }}>
+            <Link href="/admin/forgot" style={{ fontSize: '12px', color: '#38bdf8', textDecoration: 'none' }}>
               ¿Olvidaste la contraseña?
-            </a>
+            </Link>
           </div>
 
           <button

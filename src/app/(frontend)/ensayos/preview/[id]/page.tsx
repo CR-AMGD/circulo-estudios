@@ -37,6 +37,10 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
     ? ensayo.autor
     : [ensayo.autor].filter(Boolean)
 
+  const fechaPublicacionTexto = ensayo.fechaPublicacion
+    ? new Date(ensayo.fechaPublicacion).toLocaleDateString('es-MX')
+    : 'Sin fecha de publicación'
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 pb-20">
       {/* BANNER FLOTANTE DE VISTA PREVIA Y ACCIONES */}
@@ -94,7 +98,7 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
               </strong>
             </span>
             <span>•</span>
-            <span>{new Date(ensayo.fechaPublicacion || Date.now()).toLocaleDateString('es-MX')}</span>
+            <span>{fechaPublicacionTexto}</span>
           </div>
         </header>
 
