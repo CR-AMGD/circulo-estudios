@@ -1,43 +1,33 @@
-version: '3'
+# MongoDB local para desarrollo — sin depender de Mongo Atlas.
+#
+# Replica set de un solo nodo (rs0): Atlas siempre es un replica set y el adapter
+# de Payload solo habilita transacciones cuando la URI incluye `replicaSet=`.
+# El `rs.initiate()` se ejecuta de forma idempotente desde el healthcheck.
+#
+# Uso: `pnpm db:up` / `pnpm db:down` (ver scripts en package.json).
+# La app Next/Payload corre en el host (`pnpm dev`), no en Docker.
 
 services:
-  payload:
-    image: node:22-alpine
-    ports:
-      - '3000:3000'
-    volumes:
-      - .:/home/node/app
-      - node_modules:/home/node/app/node_modules
-    working_dir: /home/node/app/
-    command: sh -c "corepack enable && pnpm install && pnpm dev"
-    depends_on:
-      - mongo
-      # - postgres
-    env_file:
-      - .env
-
-  # Ensure your DATABASE_URL uses 'mongo' as the hostname ie. mongodb://mongo/my-db-name
   mongo:
-    image: mongo:latest
+    image: mongo:8
+    container_name: circulo-mongo
+    command: ['--replSet', 'rs0', '--bind_ip_all']
     ports:
       - '27017:27017'
-    command:
-      - --storageEngine=wiredTiger
     volumes:
-      - data:/data/db
-    logging:
-      driver: none
-
-  # Uncomment the following to use postgres
-  # postgres:
-  #   restart: always
-  #   image: postgres:latest
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    healthcheck:
+      test: >
+        echo "try { rs.status().ok } catch (e) {
+          rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] }).ok
+        }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
 
 volumes:
-  data:
-  # pgdata:
-  node_modules:
+  mongo_data:
+  mongo_config:
