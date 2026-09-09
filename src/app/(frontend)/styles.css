@@ -163,3 +163,15 @@ svg {
     }
   }
 }
+
+/* Estilo elegante para citas en los ensayos */
+.prose blockquote {
+  border-left-width: 2px;
+  border-left-color: rgba(212, 175, 55, 0.6); /* Color ámbar/dorado elegante */
+  padding-left: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+  color: inherit;
+  opacity: 0.95;
+}
