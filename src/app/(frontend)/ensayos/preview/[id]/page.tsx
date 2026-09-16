@@ -110,7 +110,7 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
         )}
 
         <div className="prose prose-invert max-w-none text-neutral-200 space-y-4">
-          {/* Renderizado idéntico al detalle principal */}
+          {/* Renderizado completo con convertidores para encabezados y listas */}
           {ensayo.contenido && (
             <RichText 
               data={ensayo.contenido} 
@@ -134,6 +134,19 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
                       default:
                         return <h2 className="text-2xl font-bold text-white mt-8 mb-4">{content}</h2>
                     }
+                  },
+                  list: ({ node, nodesToJSX }: any) => {
+                    const tag = node.tag || 'ul'
+                    const content = node.children ? nodesToJSX({ nodes: node.children }) : ''
+                    
+                    if (tag === 'ol') {
+                      return <ol className="list-decimal pl-6 my-4 space-y-2">{content}</ol>
+                    }
+                    return <ul className="list-disc pl-6 my-4 space-y-2">{content}</ul>
+                  },
+                  listitem: ({ node, nodesToJSX }: any) => {
+                    const content = node.children ? nodesToJSX({ nodes: node.children }) : ''
+                    return <li className="leading-relaxed">{content}</li>
                   }
                 }
               }}
