@@ -5,11 +5,32 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { Ensayo } from '@/payload-types'
-import { formatearFecha } from '@/utils/formatearFecha'
+import { LexicalNote } from '@/components/LexicalNote' // <-- Importa tu componente
 
 interface PreviewPageProps {
   params: Promise<{ id: string }>
 }
+
+// 1. Define los convertidores de Lexical para transformar enlaces especiales en notas léxicas
+const jsxConverters = {
+  link: ({ node, nodesToJSX }: any) => {
+    const url = node.fields?.url || '';
+    
+    // Si la URL comienza con #lexical-note:, extrae el término y la definición
+    if (url.startsWith('#lexical-note:')) {
+      const payloadData = url.replace('#lexical-note:', '');
+      const [term, definition] = payloadData.split('|');
+      return <LexicalNote term={term} definition={decodeURIComponent(definition || '')} />;
+    }
+
+    // Comportamiento normal para otros enlaces
+    return (
+      <a href={url} target={node.fields?.newTab ? '_blank' : '_self'} rel="noopener noreferrer" className="text-amber-400 hover:underline">
+        {nodesToJSX({ nodes: node.children })}
+      </a>
+    );
+  },
+};
 
 export default async function EssayPreviewPage({ params }: PreviewPageProps) {
   const { id } = await params
@@ -20,7 +41,6 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
     redirect('/admin/login')
   }
 
-  // Cargar el documento incluso en borrador (draft: true)
   const doc = await payload.findByID({
     collection: 'ensayos',
     id,
@@ -33,30 +53,24 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
 
   const ensayo = doc as Ensayo
 
-  // Normalizar autor para renderizado seguro en React
   const autores = Array.isArray(ensayo.autor)
     ? ensayo.autor
     : [ensayo.autor].filter(Boolean)
 
   const fechaPublicacionTexto = ensayo.fechaPublicacion
-    ? formatearFecha(ensayo.fechaPublicacion)
+    ? new Date(ensayo.fechaPublicacion).toLocaleDateString('es-MX')
     : 'Sin fecha de publicación'
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 pb-20">
-      {/* BANNER FLOTANTE DE VISTA PREVIA Y ACCIONES */}
+      {/* (Tu banner flotante se mantiene igual...) */}
       <div className="sticky top-16 z-40 bg-neutral-900/90 backdrop-blur border-b border-neutral-800 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/20">
             👁 Modo Vista Previa ({ensayo._status === 'published' ? 'Publicado' : 'Borrador'})
           </span>
-          <p className="text-xs text-neutral-400 hidden sm:block">
-            Revisa la composición final antes de hacerlo público.
-          </p>
         </div>
-
         <div className="flex items-center gap-3">
-          {/* Botón único de Volver a Edición */}
           <Link
             href={`/admin/collections/ensayos/${ensayo.id}`}
             className="px-3.5 py-1.5 rounded-md text-xs font-medium bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-white transition-colors flex items-center gap-2"
@@ -66,7 +80,6 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
         </div>
       </div>
 
-      {/* RENDERIZADO DE LA VISTA DEL ENSAYO */}
       <article className="max-w-3xl mx-auto px-4 py-12">
         <header className="mb-8 border-b border-neutral-800 pb-8">
           <p className="text-xs uppercase tracking-widest text-[#38bdf8] font-semibold mb-2">
@@ -110,47 +123,9 @@ export default async function EssayPreviewPage({ params }: PreviewPageProps) {
         )}
 
         <div className="prose prose-invert max-w-none text-neutral-200 space-y-4">
-          {/* Renderizado completo con convertidores para encabezados y listas */}
+          {/* 2. Pasa los convertidores al componente RichText */}
           {ensayo.contenido && (
-            <RichText 
-              data={ensayo.contenido} 
-              converters={(args: any) => {
-                const defaultConverters = args?.defaultConverters || {}
-                return {
-                  ...defaultConverters,
-                  heading: ({ node, nodesToJSX }: any) => {
-                    const tag = node.tag || 'h2'
-                    const content = node.children ? nodesToJSX({ nodes: node.children }) : ''
-                    
-                    switch (tag) {
-                      case 'h1':
-                        return <h1 className="text-3xl sm:text-4xl font-bold text-white mt-10 mb-4 leading-tight">{content}</h1>
-                      case 'h2':
-                        return <h2 className="text-2xl sm:text-3xl font-bold text-white mt-8 mb-4 leading-snug">{content}</h2>
-                      case 'h3':
-                        return <h3 className="text-xl sm:text-2xl font-semibold text-neutral-200 mt-6 mb-3">{content}</h3>
-                      case 'h4':
-                        return <h4 className="text-lg font-semibold text-neutral-300 mt-4 mb-2">{content}</h4>
-                      default:
-                        return <h2 className="text-2xl font-bold text-white mt-8 mb-4">{content}</h2>
-                    }
-                  },
-                  list: ({ node, nodesToJSX }: any) => {
-                    const tag = node.tag || 'ul'
-                    const content = node.children ? nodesToJSX({ nodes: node.children }) : ''
-                    
-                    if (tag === 'ol') {
-                      return <ol className="list-decimal pl-6 my-4 space-y-2">{content}</ol>
-                    }
-                    return <ul className="list-disc pl-6 my-4 space-y-2">{content}</ul>
-                  },
-                  listitem: ({ node, nodesToJSX }: any) => {
-                    const content = node.children ? nodesToJSX({ nodes: node.children }) : ''
-                    return <li className="leading-relaxed">{content}</li>
-                  }
-                }
-              }}
-            />
+            <RichText data={ensayo.contenido} converters={jsxConverters} />
           )}
         </div>
       </article>

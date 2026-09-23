@@ -25,8 +25,8 @@ export const Ensayos: CollectionConfig = {
     useAsTitle: 'titulo',
 
     preview: (doc) => {
-      if (doc?.id) {
-        return `/ensayos/preview/${doc.id}`
+      if (doc?.slug) {
+        return `/ensayos/preview/${doc.slug}`
       }
       return null
     },
@@ -84,6 +84,33 @@ export const Ensayos: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Título del Ensayo',
+    },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'URL amigable generada automáticamente desde el título',
+      },
+      hooks: {
+        beforeValidate: [
+          ({ value, data }) => {
+            if (!value && data?.titulo) {
+              return data.titulo
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Quita acentos
+                .replace(/[^a-z0-9 ]/g, '')     // Quita caracteres especiales
+                .trim()
+                .replace(/\s+/g, '-')          // Reemplaza espacios por guiones
+            }
+            return value
+          },
+        ],
+      },
     },
     {
       name: 'autorRef',

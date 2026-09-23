@@ -11,6 +11,7 @@ interface CategoriaObj {
 
 interface Ensayo {
   id: string
+  slug?: string
   titulo: string
   autor?: string
   resumen?: string
@@ -239,7 +240,7 @@ export const AnacletoAccordion: React.FC<AnacletoAccordionProps> = ({ ensayos })
                       return (
                         <Link
                           key={ensayo.id}
-                          href={`/ensayos/${ensayo.id}`}
+                          href={`/ensayos/${ensayo.slug || ensayo.id}`}
                           className="p-4 hover:bg-neutral-900/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 group/item block"
                         >
                           <div className="space-y-1">

@@ -83,7 +83,7 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <Link 
-                    href={`/ensayos/${ensayo.id}`} 
+                    href={`/ensayos/${ensayo.slug}`} 
                     className="inline-flex items-center text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors"
                   >
                     Leer publicación →

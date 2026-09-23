@@ -14,6 +14,8 @@ import { Conversaciones } from './collections/Conversaciones'
 import { Categorias } from './collections/Categorias'
 import { Invitaciones } from './collections/Invitaciones'
 
+import { Glosario } from './collections/Glosario'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -54,6 +56,7 @@ export default buildConfig({
     Conversaciones,
     Media,
     Invitaciones,
+    Glosario
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

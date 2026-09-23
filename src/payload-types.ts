@@ -75,6 +75,7 @@ export interface Config {
     conversaciones: Conversacione;
     media: Media;
     invitaciones: Invitacione;
+    glosario: Glosario;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -90,6 +91,7 @@ export interface Config {
     conversaciones: ConversacionesSelect<false> | ConversacionesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     invitaciones: InvitacionesSelect<false> | InvitacionesSelect<true>;
+    glosario: GlosarioSelect<false> | GlosarioSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -205,6 +207,10 @@ export interface Media {
 export interface Ensayo {
   id: string;
   titulo: string;
+  /**
+   * URL amigable generada automáticamente desde el título
+   */
+  slug: string;
   autorRef?: (string | null) | User;
   /**
    * Perfil del autor o coautores del escrito.
@@ -327,6 +333,18 @@ export interface Invitacione {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "glosario".
+ */
+export interface Glosario {
+  id: string;
+  termino: string;
+  etimologia?: string | null;
+  definicion: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -380,6 +398,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'invitaciones';
         value: string | Invitacione;
+      } | null)
+    | ({
+        relationTo: 'glosario';
+        value: string | Glosario;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -466,6 +488,7 @@ export interface AutoresSelect<T extends boolean = true> {
  */
 export interface EnsayosSelect<T extends boolean = true> {
   titulo?: T;
+  slug?: T;
   autorRef?: T;
   autor?: T;
   categoria?: T;
@@ -541,6 +564,17 @@ export interface InvitacionesSelect<T extends boolean = true> {
   activo?: T;
   token?: T;
   enlaceCompleto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "glosario_select".
+ */
+export interface GlosarioSelect<T extends boolean = true> {
+  termino?: T;
+  etimologia?: T;
+  definicion?: T;
   updatedAt?: T;
   createdAt?: T;
 }

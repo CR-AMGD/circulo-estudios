@@ -12,6 +12,7 @@ interface CategoriaObj {
 
 interface Ensayo {
   id: string
+  slug?: string
   titulo: string
   resumen?: string
   contenido?: any
@@ -235,7 +236,7 @@ export function ListaEnsayosAcordeon({ ensayosPorAutor }: Props) {
                     return (
                       <Link
                         key={item.id}
-                        href={`/ensayos/${item.id}`}
+                        href={`/ensayos/${item.slug || item.id}`}
                         className="p-4 hover:bg-neutral-900/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 group/item block"
                       >
                         <div className="space-y-1">

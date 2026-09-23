@@ -21,7 +21,7 @@ export default async function AnacletoPage() {
   const categoriaId = categoriasMatch.docs[0]?.id
 
   // 2. Buscamos los ensayos asociados a ese ID (o traemos todos si prefieres filtrarlos en el componente por subcategorías/slugs hijos)
-  const { docs: ensayos } = await payload.find({
+  const { docs: ensayosRaw } = await payload.find({
     collection: 'ensayos',
     depth: 1, // Vital para que traiga los datos de la categoría y subcategorías poblados
     where: categoriaId
@@ -33,6 +33,12 @@ export default async function AnacletoPage() {
       : {}, // Si por algo no encuentra la categoría, trae un respaldo o vacío
     limit: 100,
   })
+
+  // 3. Normalizamos los ensayos asegurando que el slug viaje correctamente
+  const ensayos = ensayosRaw.map((ensayo: any) => ({
+    ...ensayo,
+    slug: ensayo.slug,
+  }))
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">

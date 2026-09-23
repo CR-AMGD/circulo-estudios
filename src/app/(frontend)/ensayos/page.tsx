@@ -61,6 +61,7 @@ export default async function EnsayosPage() {
     const ensayoNormalizado = {
       ...ensayo,
       resumen: ensayo.resumen ?? undefined,
+      slug: ensayo.slug, // Aseguramos que el slug viaje correctamente
     }
 
     acc[claveAutor].push(ensayoNormalizado as any)

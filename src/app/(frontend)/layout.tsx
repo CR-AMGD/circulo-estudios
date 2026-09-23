@@ -30,15 +30,22 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 
   // Si estamos dentro de un detalle de ensayo (ej. /ensayos/el-talon-de-aquiles)
   if (pathname.startsWith('/ensayos/')) {
-    const ensayoId = pathname.split('/')[2]
+    const ensayoSlug = pathname.split('/')[2]
 
-    if (ensayoId) {
+    if (ensayoSlug && ensayoSlug !== 'preview') {
       try {
-        const ensayo = await payload.findByID({
+        const query = await payload.find({
           collection: 'ensayos',
-          id: ensayoId,
+          where: {
+            slug: {
+              equals: ensayoSlug,
+            },
+          },
           depth: 1,
+          limit: 1,
         })
+
+        const ensayo = query.docs[0] || null
 
         const cat = ensayo?.categoria
         const slugCategoria = typeof cat === 'object' && cat !== null ? (cat.slug || '') : String(cat || '')

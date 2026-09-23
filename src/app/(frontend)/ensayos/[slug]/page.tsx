@@ -10,20 +10,26 @@ import { SetNavbarActive } from '@/components/SetNavbarActive'
 import { ShareButton } from '@/components/ShareButton'
 
 interface PageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ slug: string }>
 }
 
 export default async function EnsayoDetailPage({ params }: PageProps) {
-  const { id } = await params
+  const { slug } = await params
   const payload = await getPayload({ config })
 
   let ensayo: any = null
   try {
-    ensayo = await payload.findByID({
+    const query = await payload.find({
       collection: 'ensayos',
-      id,
+      where: {
+        slug: {
+          equals: slug,
+        },
+      },
       depth: 2,
+      limit: 1,
     })
+    ensayo = query.docs[0] || null
   } catch (error) {
     notFound()
   }
@@ -108,7 +114,7 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
   // Control para saber si hay información que valga la pena mostrar
   const tieneMetadata = Boolean(
     (conversacion && conversacion.titulo) ||
-    (parentEssay && parentEssay.id) ||
+    (parentEssay && parentEssay.slug) ||
     (ensayo.pdfAdjunto && typeof ensayo.pdfAdjunto === 'object' && ensayo.pdfAdjunto.url) ||
     relatedEssays.length > 0
   )
@@ -131,11 +137,11 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
       )}
 
       {/* Ensayo Padre */}
-      {parentEssay && parentEssay.id && (
+      {parentEssay && parentEssay.slug && (
         <div className="space-y-1.5">
           <span className="text-[11px] font-mono text-neutral-500 block">↳ Responde / Deriva de:</span>
           <Link
-            href={`/ensayos/${parentEssay.id}`}
+            href={`/ensayos/${parentEssay.slug}`}
             className={`block p-3 rounded-lg bg-neutral-950 hover:bg-neutral-850 border border-neutral-800 transition-all group ${hoverGroupColor}`}
           >
             <p className={`text-xs font-semibold text-neutral-200 transition-colors line-clamp-2 ${hoverGroupColor}`}>
@@ -169,8 +175,8 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
               if (typeof rel !== 'object' || rel === null) return null
               return (
                 <Link
-                  key={rel.id}
-                  href={`/ensayos/${rel.id}`}
+                  key={rel.id || rel.slug}
+                  href={`/ensayos/${rel.slug}`}
                   className={`block p-3 rounded-lg bg-neutral-950 hover:bg-neutral-850 border border-neutral-800 transition-all group ${hoverGroupColor}`}
                 >
                   <p className={`text-xs font-medium text-neutral-200 transition-colors line-clamp-2 ${hoverGroupColor}`}>
@@ -299,7 +305,7 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
         <footer className="mt-16 pt-8 border-t border-neutral-800/80 grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto">
           {prevEnsayo ? (
             <Link
-              href={`/ensayos/${prevEnsayo.id}`}
+              href={`/ensayos/${prevEnsayo.slug}`}
               className={`p-4 rounded-xl bg-neutral-900/60 border border-neutral-800 hover:border-neutral-700 transition-all group flex flex-col justify-between ${hoverGroupColor}`}
             >
               <span className="text-[11px] font-mono text-neutral-500 uppercase tracking-wider mb-1">
@@ -315,7 +321,7 @@ export default async function EnsayoDetailPage({ params }: PageProps) {
 
           {nextEnsayo ? (
             <Link
-              href={`/ensayos/${nextEnsayo.id}`}
+              href={`/ensayos/${nextEnsayo.slug}`}
               className={`p-4 rounded-xl bg-neutral-900/60 border border-neutral-800 hover:border-neutral-700 transition-all group flex flex-col justify-between text-right ${hoverGroupColor}`}
             >
               <span className="text-[11px] font-mono text-neutral-500 uppercase tracking-wider mb-1">
