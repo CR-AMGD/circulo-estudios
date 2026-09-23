@@ -116,13 +116,23 @@ const importEnsayos = async () => {
         }
       }
 
+      // --- GENERAR SLUG A PARTIR DEL TÍTULO ---
+      const slugGenerado = ensayo.titulo
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+
       // --- RESOLVER FECHA Y CREAR ENSAYO ---
       const fechaEnsayo = ensayo.fechaPublicacion || (metadata.fecha_publicacion ? `${metadata.fecha_publicacion}T00:00:00.000Z` : new Date().toISOString())
 
       const ensayoCreado = await payload.create({
         collection: 'ensayos',
+        draft: false,
         data: {
           titulo: ensayo.titulo,
+          slug: slugGenerado, // Requerido por el tipado estricto
           autorRef: adminUser.id,
           autor: autoresIds as any,
           categoria: categoriaId as any,
@@ -133,7 +143,7 @@ const importEnsayos = async () => {
         },
       })
 
-      console.log(`✅ Cargado exitosamente: "${ensayoCreado.titulo}" (ID: ${ensayoCreado.id})`)
+      console.log(`✅ Cargado exitosamente: "${ensayoCreado.titulo}" (Slug: ${slugGenerado})`)
     }
 
     console.log('\n🎉 Importación finalizada con éxito.')

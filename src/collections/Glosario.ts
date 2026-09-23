@@ -5,16 +5,6 @@ export const Glosario: CollectionConfig = {
   admin: {
     useAsTitle: 'termino',
     defaultColumns: ['termino', 'updatedAt'],
-    labels: {
-      singular: {
-        en: 'Glosario',
-        es: 'Glosario',
-      },
-      plural: {
-        en: 'Glosario',
-        es: 'Glosario',
-      },
-    },
   },
   access: {
     read: () => true,
